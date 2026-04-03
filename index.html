@@ -34,11 +34,14 @@
       --shadow: 0 8px 40px rgba(26,16,8,0.12);
       --shadow-lg: 0 20px 80px rgba(26,16,8,0.18);
       --nav-bg: rgba(250,248,245,0.92);
-      --font-display: 'Playfair Display', serif;
-      --font-title: 'Bebas Neue', sans-serif;
       --font-body: 'DM Sans', sans-serif;
       --radius: 12px;
       --transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+      
+      /* Fixed Header/Footer Background */
+      --header-footer-bg: #1a1008;
+      --header-footer-text: #f5f0e8;
+      --header-footer-text-dim: rgba(245,240,232,0.7);
     }
     [data-theme="dark"] {
       --bg: #0f0a06;
@@ -50,7 +53,6 @@
       --border: rgba(245,240,232,0.1);
       --shadow: 0 8px 40px rgba(0,0,0,0.4);
       --shadow-lg: 0 20px 80px rgba(0,0,0,0.5);
-      --nav-bg: rgba(15,10,6,0.92);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -66,32 +68,6 @@
     img { max-width: 100%; display: block; }
     a { text-decoration: none; color: inherit; }
     ul { list-style: none; }
-
-    /* ============================================================
-       CUSTOM CURSOR
-       ============================================================ */
-    .cursor {
-      width: 12px; height: 12px;
-      background: var(--primary);
-      border-radius: 50%;
-      position: fixed; z-index: 99999;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
-      mix-blend-mode: multiply;
-    }
-    .cursor-ring {
-      width: 36px; height: 36px;
-      border: 2px solid var(--primary);
-      border-radius: 50%;
-      position: fixed; z-index: 99998;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      transition: transform 0.15s ease-out, width 0.3s, height 0.3s, opacity 0.3s;
-      opacity: 0.5;
-    }
-    body:hover .cursor { opacity: 1; }
-    @media (max-width: 768px) { .cursor, .cursor-ring { display: none; } }
 
     /* ============================================================
        MOSAIC BACKGROUND TILE ANIMATION
@@ -118,9 +94,9 @@
        ============================================================ */
     .navbar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-      background: var(--nav-bg);
+      background: var(--header-footer-bg);
       backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid rgba(245,240,232,0.1);
       padding: 0 32px;
       height: 68px;
       display: flex; align-items: center;
@@ -138,8 +114,9 @@
       display: flex; align-items: center; gap: 10px;
       font-family: var(--font-display);
       font-size: 1.5rem; font-weight: 700;
-      color: var(--text);
+      color: var(--header-footer-text);
       flex-shrink: 0;
+      cursor: pointer;
     }
     .nav-logo-icon {
       width: 36px; height: 36px;
@@ -164,7 +141,7 @@
     }
     .nav-link {
       font-size: 0.82rem; font-weight: 500; letter-spacing: 0.3px;
-      color: var(--text2);
+      color: var(--header-footer-text-dim);
       padding: 7px 14px; border-radius: 8px;
       transition: var(--transition); position: relative;
     }
@@ -202,9 +179,9 @@
     .icon-btn {
       width: 36px; height: 36px; border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      background: var(--bg2); border: 1px solid var(--border);
+      background: rgba(245,240,232,0.1); border: 1px solid rgba(245,240,232,0.2);
       cursor: pointer; transition: var(--transition); font-size: 0.75rem;
-      color: var(--text2);
+      color: var(--header-footer-text);
     }
     .icon-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: scale(1.05); }
 
@@ -215,7 +192,7 @@
     }
     .hamburger span {
       display: block; width: 22px; height: 2px;
-      background: var(--text); border-radius: 2px; transition: var(--transition);
+      background: var(--header-footer-text); border-radius: 2px; transition: var(--transition);
     }
     .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
     .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
@@ -224,8 +201,8 @@
     /* Mobile menu */
     .mobile-menu {
       position: fixed; top: 68px; left: 0; right: 0;
-      background: var(--nav-bg); backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
+      background: var(--header-footer-bg); backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(245,240,232,0.1);
       padding: 20px 24px 28px;
       display: flex; flex-direction: column; gap: 4px;
       transform: translateY(-120%); opacity: 0;
@@ -235,12 +212,31 @@
     .mobile-menu.open { transform: translateY(0); opacity: 1; }
     .mobile-menu .nav-link { font-size: 0.95rem; padding: 11px 14px; }
     .mobile-menu .nav-cta { margin-top: 8px; text-align: center; display: block; padding: 12px; }
+    .mobile-menu .mobile-controls {
+      display: none;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      gap: 8px;
+    }
+    @media (max-width: 768px) {
+      .mobile-menu .mobile-controls {
+        display: flex;
+        justify-content: center;
+      }
+    }
 
     @media (max-width: 1023px) { .nav-links { display: none; } }
     @media (max-width: 1023px) { .hamburger { display: flex; } }
-    @media (max-width: 640px) {
+    @media (max-width: 768px) { 
       .navbar { padding: 0 20px; }
       .nav-cta.desktop-only { display: none; }
+      .nav-right .icon-btn { display: none; }
+    }
+    @media (max-width: 360px) {
+      .navbar { padding: 0 16px; }
+      .nav-cta.desktop-only { display: none; }
+      .nav-right .icon-btn { display: none; }
     }
 
     /* ============================================================
@@ -592,7 +588,7 @@
     .service-card:hover::before { transform: scaleX(1); }
 
     .service-icon-wrap {
-      width: 68px; height: 68px; border-radius: 16px;
+      width: 84px; height: 84px; border-radius: 16px;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.8rem; margin-bottom: 20px;
       transition: transform 0.4s;
@@ -873,12 +869,12 @@
        FOOTER
        ============================================================ */
     footer {
-      background: var(--text);
-      color: rgba(245,240,232,0.85);
+      background: var(--header-footer-bg);
+      color: var(--header-footer-text-dim);
       padding: 60px 32px 32px;
     }
-    [data-theme="light"] footer { background: #1a1008; }
-    [data-theme="dark"] footer { background: #080503; }
+    
+    footer .nav-logo { color: var(--header-footer-text) !important; }
 
     .footer-inner { max-width: 1200px; margin: 0 auto; }
     .footer-top {
@@ -1091,10 +1087,6 @@
   </div>
 </div>
 
-<!-- CUSTOM CURSOR -->
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-
 <!-- MOSAIC BACKGROUND -->
 <div class="mosaic-bg" id="mosaicBg"></div>
 
@@ -1113,14 +1105,14 @@
 <nav class="navbar" id="navbar">
   <div class="nav-inner">
     <!-- LEFT: Logo -->
-    <a href="#hero" class="nav-logo">
+    <a href="index.html" class="nav-logo">
       <div class="nav-logo-icon">
         <span class="logo-t1"></span>
         <span class="logo-t2"></span>
         <span class="logo-t3"></span>
         <span class="logo-t4"></span>
       </div>
-      Mr<span class="logo-dot">.</span>Art
+      <span>Mr.Art<span style="color: var(--primary);">.</span></span>
     </a>
 
     <!-- CENTER: Nav links (desktop) -->
@@ -1136,8 +1128,8 @@
 
     <!-- RIGHT: Controls -->
     <div class="nav-right">
-      <button class="nav-cta desktop-only" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
-        Hire Me
+      <button class="nav-cta desktop-only" onclick="window.location.href='login.html'">
+        Login
       </button>
       <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
       <button class="icon-btn" id="rtlToggle" title="Toggle RTL" style="font-size:0.72rem;letter-spacing:0.5px;font-weight:600;">RTL</button>
@@ -1157,7 +1149,13 @@
   <a href="#process" class="nav-link" onclick="closeMobileMenu()">Process</a>
   <a href="#testimonials" class="nav-link" onclick="closeMobileMenu()">Testimonials</a>
   <a href="#contact" class="nav-link" onclick="closeMobileMenu()">Contact</a>
-  <a href="#contact" class="nav-cta" onclick="closeMobileMenu()">✉ Hire Me</a>
+  <a href="login.html" class="nav-cta" onclick="closeMobileMenu()">Login</a>
+  
+  <!-- Mobile Controls -->
+  <div class="mobile-controls">
+    <button class="icon-btn" id="themeToggleMobile" title="Toggle theme">🌙</button>
+    <button class="icon-btn" id="rtlToggleMobile" title="Toggle RTL" style="font-size:0.72rem;letter-spacing:0.5px;font-weight:600;">RTL</button>
+  </div>
 </div>
 
 <!-- MOSAIC DIVIDER -->
@@ -1190,11 +1188,12 @@
 
       <div class="hero-cta-row">
         <button class="btn-primary" onclick="document.getElementById('portfolio').scrollIntoView({behavior:'smooth'})">
-          🎨 View My Work
+          🎨 Portfolio
         </button>
-        <button class="btn-secondary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
-          💬 Let's Talk
+        <button class="btn-primary" onclick="document.getElementById('portfolio').scrollIntoView({behavior:'smooth'})">
+          🎨 Gallery-m
         </button>
+        
       </div>
 
       <div class="hero-stats">
@@ -1219,18 +1218,9 @@
         <!-- Tiles filled by JS -->
       </div>
 
-      <div class="hero-visual-badge">
-        <div class="hvb-icon">🏆</div>
-        <div>
-          <div class="hvb-text">Award Winning Artist</div>
-          <div class="hvb-sub">National Art Guild 2023</div>
-        </div>
-      </div>
+      
 
-      <div class="hero-visual-badge2">
-        <div class="hvb2-num">4.9★</div>
-        <div class="hvb2-text">CLIENT RATING</div>
-      </div>
+      
     </div>
   </div>
 </section>
@@ -1255,7 +1245,7 @@
     <div class="about-grid">
       <!-- Image -->
       <div class="about-img-wrap reveal-left">
-        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=520&fit=crop&auto=format" alt="Mosaic Artist at Work" class="about-main-img">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8noH7fIaVGmzPjgl0F3X8eUPY30w92yX9Ag&s" alt="Mosaic Artist at Work" class="about-main-img">
         <div class="about-img-badge">
           <div class="about-badge-num">14+</div>
           <div class="about-badge-text">YEARS CRAFTING</div>
@@ -1291,7 +1281,7 @@
           <div class="skill-item reveal delay-6"><span class="skill-icon">♻️</span> Eco-Friendly Art</div>
         </div>
 
-        <button class="btn-primary" style="margin-top:28px;" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+        <button class="btn-primary" style="margin-top:28px;" onclick="window.location.href='login.html'">
           Commission a Piece →
         </button>
       </div>
@@ -1313,7 +1303,7 @@
     <div class="services-grid">
       <div class="service-card reveal delay-1">
         <div class="service-icon-wrap si-1">
-          <img src="https://images.unsplash.com/photo-1578912681005-fb4b1e0c8576?w=80&h=80&fit=crop&auto=format" alt="Interior Murals" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+          <img src="https://www.giffywalls.in/cdn/shop/files/black-night-art-deco-mosaic-wall-mural-9129653.jpg?v=1769616027&width=1946" alt="Interior Murals" style="width:70px;height:70px;border-radius:12px;object-fit:cover;">
         </div>
         <h3>Interior Murals</h3>
         <p>Transform your kitchen backsplash, bathroom wall, or living room focal point into a breathtaking mosaic narrative that becomes the heart of your home.</p>
@@ -1322,7 +1312,7 @@
 
       <div class="service-card reveal delay-2">
         <div class="service-icon-wrap si-2">
-          <img src="https://images.unsplash.com/photo-1585238342024-78a38b9ae233?w=80&h=80&fit=crop&auto=format" alt="Garden Art" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+          <img src="https://miro.medium.com/v2/resize:fit:1400/0*TNS-cBQ-L2lF-8a-.jpeg" alt="Garden Art" style="width:70px;height:70px;border-radius:12px;object-fit:cover;">
         </div>
         <h3>Garden Art</h3>
         <p>Weather-resistant mosaic installations for gardens, patios, and outdoor spaces. Each piece designed to harmonize with nature and withstand the elements.</p>
@@ -1331,7 +1321,7 @@
 
       <div class="service-card reveal delay-3">
         <div class="service-icon-wrap si-3">
-          <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=80&h=80&fit=crop&auto=format" alt="Framed Pieces" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+          <img src="https://new.mosaicslab.com/blog/wp-content/uploads/2022/07/11.-Mosaic_Frames-Mosaic_Artwork_With_Frames-Frames-For-Mosaic-Murals.jpeg" alt="Framed Pieces" style="width:70px;height:70px;border-radius:12px;object-fit:cover;">
         </div>
         <h3>Framed Pieces</h3>
         <p>Gallery-ready mosaic artworks perfect for collectors and art enthusiasts. Each piece comes with custom framing and certificate of authenticity.</p>
@@ -1340,7 +1330,7 @@
 
       <div class="service-card reveal delay-1">
         <div class="service-icon-wrap si-4">
-          <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=80&h=80&fit=crop&auto=format" alt="Pool & Fountain" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+          <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=80&h=80&fit=crop&auto=format" alt="Pool & Fountain" style="width:70px;height:70px;border-radius:12px;object-fit:cover;">
         </div>
         <h3>Pool & Fountain</h3>
         <p>Underwater mosaics and water feature designs that create stunning visual effects. Specialized waterproof materials ensure longevity and beauty.</p>
@@ -1349,16 +1339,16 @@
 
       <div class="service-card reveal delay-2">
         <div class="service-icon-wrap si-5">
-          <img src="https://images.unsplash.com/photo-1448630360428-65456885c650?w=80&h=80&fit=crop&auto=format" alt="Commercial" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+          <img src="https://images.unsplash.com/photo-1448630360428-65456885c650?w=80&h=80&fit=crop&auto=format" alt="Commercial" style="width:70px;height:70px;border-radius:12px;object-fit:cover;">
         </div>
         <h3>Commercial</h3>
-        <p>Large-scale installations for hotels, restaurants, offices, and public spaces. Brand integration and architectural harmony are my specialties.</p>
+        <p>Large-scale installations for hotels, restaurants, offices, and public spaces. Brand integration and architectural harmony are my specialties hospital.</p>
         <div class="service-price">From <strong>$1,000</strong> per sq. meter</div>
       </div>
 
       <div class="service-card reveal delay-3">
         <div class="service-icon-wrap si-6">
-          <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=80&h=80&fit=crop&auto=format" alt="Workshops" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+          <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=80&h=80&fit=crop&auto=format" alt="Workshops" style="width:70px;height:70px;border-radius:12px;object-fit:cover;">
         </div>
         <h3>Workshops</h3>
         <p>Learn the ancient art of mosaic-making in my Florence studio. Private and group sessions available for all skill levels, from beginners to advanced.</p>
@@ -1381,15 +1371,15 @@
 
     <div class="portfolio-filters reveal">
       <button class="filter-btn active" data-filter="all">All Work</button>
-      <button class="filter-btn" data-filter="interior">Interiors</button>
-      <button class="filter-btn" data-filter="garden">Garden</button>
-      <button class="filter-btn" data-filter="framed">Framed Art</button>
-      <button class="filter-btn" data-filter="commercial">Commercial</button>
+      <button class="filter-btn" data-filter="all">Interiors</button>
+      <button class="filter-btn" data-filter="all">Garden</button>
+      <button class="filter-btn" data-filter="all">Framed Art</button>
+      <button class="filter-btn" data-filter="all">Commercial</button>
     </div>
 
     <div class="portfolio-grid" id="portfolioGrid">
       <div class="portfolio-item reveal delay-1" data-category="interior">
-        <img src="https://images.unsplash.com/photo-1578912681005-fb4b1e0c8576?w=600&h=450&fit=crop&auto=format" alt="Tuscan Kitchen Backsplash" class="portfolio-img">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8Ue1J7W1JeNmr8UU40fATR3wfSStokc1zpw&s" alt="Tuscan Kitchen Backsplash" class="portfolio-img">
         <div class="portfolio-overlay">
           <div class="po-title">Tuscan Kitchen Backsplash</div>
           <div class="po-tag">Interior · Italian Glass</div>
@@ -1398,7 +1388,7 @@
       </div>
 
       <div class="portfolio-item reveal delay-2" data-category="garden">
-        <img src="https://images.unsplash.com/photo-1585238342024-78a38b9ae233?w=600&h=450&fit=crop&auto=format" alt="Midnight Garden Wall" class="portfolio-img">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMsz5-lbp1fB4rTSvEbcI16eYfOElBdXrbHg&s" alt="Midnight Garden Wall" class="portfolio-img">
         <div class="portfolio-overlay">
           <div class="po-title">Midnight Garden Wall</div>
           <div class="po-tag">Garden · Natural Stone</div>
@@ -1407,7 +1397,7 @@
       </div>
 
       <div class="portfolio-item reveal delay-3" data-category="framed">
-        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=450&fit=crop&auto=format" alt="Butterfly Serenade" class="portfolio-img">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRO2KqvOmIifddlK-9XUKnLMTnaCYT03e73YQ&s" alt="Butterfly Serenade" class="portfolio-img">
         <div class="portfolio-overlay">
           <div class="po-title">Butterfly Serenade</div>
           <div class="po-tag">Framed · Mixed Media</div>
@@ -1416,7 +1406,7 @@
       </div>
 
       <div class="portfolio-item reveal delay-1" data-category="commercial">
-        <img src="https://images.unsplash.com/photo-1448630360428-65456885c650?w=600&h=450&fit=crop&auto=format" alt="Hotel Lobby Feature Wall" class="portfolio-img">
+        <img src="https://mecartworks.ae/wp-content/uploads/2025/06/Artistic-Giraffe-Mosaic-Wall-Mural.webp" alt="Hotel Lobby Feature Wall" class="portfolio-img">
         <div class="portfolio-overlay">
           <div class="po-title">Hotel Lobby Feature Wall</div>
           <div class="po-tag">Commercial · Grand Scale</div>
@@ -1425,7 +1415,7 @@
       </div>
 
       <div class="portfolio-item reveal delay-2" data-category="interior">
-        <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=600&h=450&fit=crop&auto=format" alt="Spa Sanctuary Mural" class="portfolio-img">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR43gtPpOXfDAXfh_KTtMTY6283LA-84zVxyQ&s" alt="Spa Sanctuary Mural" class="portfolio-img">
         <div class="portfolio-overlay">
           <div class="po-title">Spa Sanctuary Mural</div>
           <div class="po-tag">Interior · Ceramic</div>
@@ -1434,7 +1424,7 @@
       </div>
 
       <div class="portfolio-item reveal delay-3" data-category="garden">
-        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=450&fit=crop&auto=format" alt="Villa Fountain Panel" class="portfolio-img">
+        <img src="https://mecartworks.com/wp-content/uploads/2023/07/Islamic-art-arabesque-geometric-pattern-green-abstract-background-white-glass-tile-handcut-fountain-wall-niche.jpg" alt="Villa Fountain Panel" class="portfolio-img">
         <div class="portfolio-overlay">
           <div class="po-title">Villa Fountain Panel</div>
           <div class="po-tag">Garden · Waterproof Glass</div>
@@ -1444,7 +1434,7 @@
     </div>
 
     <div style="text-align:center;margin-top:44px;" class="reveal">
-      <button class="btn-secondary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+      <button class="btn-secondary" onclick="window.location.href='login.html'">
         🖼 Commission Your Piece
       </button>
     </div>
@@ -1494,25 +1484,25 @@
     <div class="process-steps">
       <div class="process-step reveal delay-1">
         <div class="step-num sn-1">01</div>
-        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=300&h=200&fit=crop&auto=format" alt="Discovery Call" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:16px;">
+        <img src="https://images.jdmagicbox.com/v2/comp/ahmedabad/i7/079pxx79.xx79.241016231132.x6i7/catalogue/mosaic-art-craft-gurukul-road-ahmedabad-glass-dealers-8qh0agvrld-250.jpg" alt="Discovery Call" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:16px;">
         <h3>Discovery Call</h3>
         <p>We discuss your space, vision, color palette, and budget. I listen deeply to understand the story you want your mosaic to tell.</p>
       </div>
       <div class="process-step reveal delay-2">
         <div class="step-num sn-2">02</div>
-        <img src="https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=300&h=200&fit=crop&auto=format" alt="Design Proposal" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:16px;">
+        <img src="https://new.mosaicslab.com/blog/wp-content/uploads/2020/04/3.-Handmade-Mosaic-Artwork-by-Mosaics-Lab-1.jpg" alt="Design Proposal" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:16px;">
         <h3>Design Proposal</h3>
         <p>I create a detailed design mockup with material samples, color studies, and a full quote. You get to visualize the finished piece before a single tile is laid.</p>
       </div>
       <div class="process-step reveal delay-3">
         <div class="step-num sn-3">03</div>
-        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=200&fit=crop&auto=format" alt="Handcrafted Creation" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:16px;">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZ5KXqAWgBfXSoLeEkV2mMfu5GzWoUqm9awA&s" alt="Handcrafted Creation" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:16px;">
         <h3>Handcrafted Creation</h3>
         <p>The magic begins! Each tesserae is hand-cut and placed with precision. You receive photo updates throughout the creation process.</p>
       </div>
       <div class="process-step reveal delay-4">
         <div class="step-num sn-4">04</div>
-        <img src="https://images.unsplash.com/photo-1448630360428-65456885c650?w=300&h=200&fit=crop&auto=format" alt="Installation & Care" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:16px;">
+        <img src="https://i.ytimg.com/vi/pTfdDOqKzcE/hq720.jpg?sqp=-oaymwE7CK4FEIIDSFryq4qpAy0IARUAAAAAGAElAADIQj0AgKJD8AEB-AHUBoAC4AOKAgwIABABGGUgTShFMA8=&rs=AOn4CLB0UfezJJcZSz61fSrUelZ_7j9r-g" alt="Installation & Care" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:16px;">
         <h3>Installation & Care</h3>
         <p>Professional installation at your location, complete clean-up, and a full care guide. Plus 5-year craftsmanship guarantee on all work.</p>
       </div>
@@ -1536,7 +1526,7 @@
         <div class="tc-stars">★★★★★</div>
         <p class="tc-text">"Marco transformed our kitchen into an absolute masterpiece. The Italian glass backsplash catches the morning light in the most magical way. We get compliments every single week."</p>
         <div class="tc-author">
-          <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=80&h=80&fit=crop&auto=format" alt="Sofia Bianchi" class="tc-avatar" style="object-fit:cover;">
+          <img src="https://media.licdn.com/dms/image/v2/D4D03AQHuY5KVmTJzJQ/profile-displayphoto-shrink_200_200/B4DZWv2oqnGkAk-/0/1742412091293?e=2147483647&v=beta&t=ZSd0O6SMiHvVXwBVRg63BqUxykn9AMiJs2hXsPd_eTo" alt="Sofia Bianchi" class="tc-avatar" style="object-fit:cover;">
           <div>
             <div class="tc-name">Sofia Bianchi</div>
             <div class="tc-role">Interior Designer · Rome</div>
@@ -1546,7 +1536,7 @@
 
       <div class="testimonial-card reveal delay-2">
         <div class="tc-stars">★★★★★</div>
-        <p class="tc-text">"Our garden wall mosaic has become the neighbourhood talking point. Marco listened to every detail of our brief and created something that exceeded every expectation. True artistry."</p>
+        <p class="tc-text">"Our garden wall mosaic has become the neighbourhood talking point. Marco listened to every detail of our brief and created something that exceeded every expectation. True artistry men."</p>
         <div class="tc-author">
           <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&auto=format" alt="David & Maria" class="tc-avatar" style="object-fit:cover;">
           <div>
@@ -1594,7 +1584,7 @@
 
       <div class="testimonial-card reveal delay-6">
         <div class="tc-stars">★★★★★</div>
-        <p class="tc-text">"Our pool mosaic is breathtaking. Marco designed a Mediterranean seascape that perfectly captures the spirit of our home. The underwater glass work shimmers like a living painting."</p>
+        <p class="tc-text">"Our pool mosaic is breathtaking. Marco designed a Mediterranean seascape that perfectly captures the spirit of our home. The underwater glass work shimmers  living Human."</p>
         <div class="tc-author">
           <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&auto=format" alt="Roberto & Nina" class="tc-avatar" style="object-fit:cover;">
           <div>
@@ -1650,11 +1640,22 @@
           </div>
         </div>
 
-        <div style="display:flex;gap:10px;margin-top:24px;justify-content:center;">
-          <a href="#" class="social-btn" style="background:#E4405F;border-color:#E4405F;color:#fff;">�</a>
-          <a href="#" class="social-btn" style="background:#0077B5;border-color:#0077B5;color:#fff;">in</a>
-          <a href="#" class="social-btn" style="background:#1DA1F2;border-color:#1DA1F2;color:#fff;">🐦</a>
-          <a href="#" class="social-btn" style="background:#BD081C;border-color:#BD081C;color:#fff;">📌</a>
+        <div style="display:flex;gap:12px;margin-top:24px;justify-content:center;">
+          <a href="#" class="social-btn" style="background:#E4405F;border-color:#E4405F;color:#fff;" title="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          </a>
+          <a href="#" class="social-btn" style="background:#1877F2;border-color:#1877F2;color:#fff;" title="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="#" class="social-btn" style="background:#0077B5;border-color:#0077B5;color:#fff;" title="LinkedIn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+          </a>
+          <a href="#" class="social-btn" style="background:#000;border-color:#000;color:#fff;" title="X (Twitter)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+          </a>
+          <a href="#" class="social-btn" style="background:#BD081C;border-color:#BD081C;color:#fff;" title="Pinterest">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line><circle cx="12" cy="12" r="10"></circle></svg>
+          </a>
         </div>
       </div>
 
@@ -1730,21 +1731,32 @@
   <div class="footer-inner">
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="nav-logo" style="margin-bottom:14px;">
+        <a href="index.html" class="nav-logo" style="margin-bottom:14px; color: #f5f0e8;">
           <div class="nav-logo-icon">
             <span class="logo-t1"></span>
             <span class="logo-t2"></span>
             <span class="logo-t3"></span>
             <span class="logo-t4"></span>
           </div>
-          Mr<span class="logo-dot">.</span>Art
-        </div>
+          <span>Mr.Art<span style="color: var(--primary);">.</span></span>
+        </a>
         <p>Handcrafted mosaic art for homes, gardens, and spaces that deserve to be extraordinary. Based in Florence, working worldwide.</p>
         <div class="footer-socials">
-          <a href="#" class="social-btn" style="background:#E4405F;border-color:#E4405F;color:#fff;">�</a>
-          <a href="#" class="social-btn" style="background:#0077B5;border-color:#0077B5;color:#fff;">in</a>
-          <a href="#" class="social-btn" style="background:#1DA1F2;border-color:#1DA1F2;color:#fff;">🐦</a>
-          <a href="#" class="social-btn" style="background:#BD081C;border-color:#BD081C;color:#fff;">📌</a>
+          <a href="#" class="social-btn" style="background:#E4405F;border-color:#E4405F;color:#fff;" title="Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          </a>
+          <a href="#" class="social-btn" style="background:#1877F2;border-color:#1877F2;color:#fff;" title="Facebook">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="#" class="social-btn" style="background:#0077B5;border-color:#0077B5;color:#fff;" title="LinkedIn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+          </a>
+          <a href="#" class="social-btn" style="background:#000;border-color:#000;color:#fff;" title="X (Twitter)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+          </a>
+          <a href="#" class="social-btn" style="background:#BD081C;border-color:#BD081C;color:#fff;" title="Pinterest">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line><circle cx="12" cy="12" r="10"></circle></svg>
+          </a>
         </div>
       </div>
 
@@ -1812,41 +1824,6 @@
   });
 
   // ============================================================
-  // CUSTOM CURSOR
-  // ============================================================
-  const cursor = document.getElementById('cursor');
-  const cursorRing = document.getElementById('cursorRing');
-  let mx = 0, my = 0, rx = 0, ry = 0;
-
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    cursor.style.left = mx + 'px';
-    cursor.style.top = my + 'px';
-  });
-
-  function animateRing() {
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    cursorRing.style.left = rx + 'px';
-    cursorRing.style.top = ry + 'px';
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
-
-  document.querySelectorAll('a, button, .portfolio-item, .service-card').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      cursor.style.width = '20px'; cursor.style.height = '20px';
-      cursorRing.style.width = '56px'; cursorRing.style.height = '56px';
-      cursor.style.background = 'var(--accent)';
-    });
-    el.addEventListener('mouseleave', () => {
-      cursor.style.width = '12px'; cursor.style.height = '12px';
-      cursorRing.style.width = '36px'; cursorRing.style.height = '36px';
-      cursor.style.background = 'var(--primary)';
-    });
-  });
-
-  // ============================================================
   // FLOATING MOSAIC BG TILES
   // ============================================================
   const mosaicBg = document.getElementById('mosaicBg');
@@ -1870,46 +1847,95 @@
   // HERO MOSAIC SHOWCASE
   // ============================================================
   const showcase = document.getElementById('mosaicShowcase');
+  
+  // Use reliable mosaic images
   const tileConfigs = [
-    {span:'big',image:'https://images.unsplash.com/photo-1578912681005-fb4b1e0c8576?w=400&h=400&fit=crop&auto=format'},
-    {span:'med',image:'https://images.unsplash.com/photo-1585238342024-78a38b9ae233?w=300&h=300&fit=crop&auto=format'},
-    {span:'small',color:'c3'},
-    {span:'small',color:'c4'},
-    {span:'med',image:'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop&auto=format'},
-    {span:'small',color:'c6'},
-    {span:'small',color:'c7'},
-    {span:'tall',image:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=400&fit=crop&auto=format'},
-    {span:'med',image:'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=300&h=300&fit=crop&auto=format'},
-    {span:'small',color:'c10'},
-    {span:'small',color:'c1'},
-    {span:'med',image:'https://images.unsplash.com/photo-1448630360428-65456885c650?w=300&h=300&fit=crop&auto=format'},
+    {span:'big',image:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8noH7fIaVGmzPjgl0F3X8eUPY30w92yX9Ag&s'},
+    {span:'med',image:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMsz5-lbp1fB4rTSvEbcI16eYfOElBdXrbHg&s'},
+    {span:'small',image:'https://www.giffywalls.in/cdn/shop/files/black-night-art-deco-mosaic-wall-mural-9129653.jpg?v=1769616027&width=1946'},
+    {span:'small',image:'https://miro.medium.com/v2/resize:fit:1400/0*TNS-cBQ-L2lF-8a-.jpeg'},
+    {span:'med',image:'https://new.mosaicslab.com/blog/wp-content/uploads/2022/07/11.-Mosaic_Frames-Mosaic_Artwork_With_Frames-Frames-For-Mosaic-Murals.jpeg'},
+    {span:'small',image:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRO2KqvOmIifddlK-9XUKnLMTnaCYT03e73YQ&s'},
+    {span:'small',image:'https://mecartworks.ae/wp-content/uploads/2025/06/Artistic-Giraffe-Mosaic-Wall-Mural.webp'},
+    {span:'tall',image:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR43gtPpOXfDAXfh_KTtMTY6283LA-84zVxyQ&s'},
+    {span:'med',image:'https://www.shutterstock.com/image-photo/traditional-moroccan-fountain-fine-mcolorful-600w-2585268959.jpg'},
+    {span:'small',image:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8noH7fIaVGmzPjgl0F3X8eUPY30w92yX9Ag&s'},
+    {span:'small',image:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8Ue1J7W1JeNmr8UU40fATR3wfSStokc1zpw&s'},
+    {span:'med',image:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMsz5-lbp1fB4rTSvEbcI16eYfOElBdXrbHg&s'},
   ];
-  tileConfigs.forEach((cfg, i) => {
-    const t = document.createElement('div');
-    t.className = `ms-tile ${cfg.span} ${cfg.color || ''}`;
-    t.style.animationDelay = `${i * 0.08}s`;
-    if (cfg.image) {
-      const img = document.createElement('img');
-      img.src = cfg.image;
-      img.alt = `Mosaic Art ${i+1}`;
-      img.style.width = '100%';
-      img.style.height = '100%';
-      img.style.objectFit = 'cover';
-      t.appendChild(img);
-    }
-    showcase.appendChild(t);
-  });
-
-  // Add staggered entrance animation to tiles
-  showcase.querySelectorAll('.ms-tile').forEach((tile, i) => {
-    tile.style.opacity = '0';
-    tile.style.transform = 'scale(0.5)';
+  
+  // Function to create tiles
+  function createMosaicTiles() {
+    if (!showcase) return;
+    
+    // Clear existing content
+    showcase.innerHTML = '';
+    
+    tileConfigs.forEach((cfg, i) => {
+      const t = document.createElement('div');
+      t.className = `ms-tile ${cfg.span}`;
+      t.style.cssText = `
+        animation-delay: ${i * 0.08}s;
+        background: linear-gradient(135deg, #c84b2f, #e8b84b);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      `;
+      
+      if (cfg.image) {
+        const img = document.createElement('img');
+        img.src = cfg.image;
+        img.alt = `Mosaic Art ${i+1}`;
+        img.style.cssText = `
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.6s ease;
+        `;
+        
+        // Add hover effect
+        img.onload = function() {
+          t.addEventListener('mouseenter', () => {
+            img.style.transform = 'scale(1.08)';
+          });
+          t.addEventListener('mouseleave', () => {
+            img.style.transform = 'scale(1)';
+          });
+        };
+        
+        // Fallback if image fails
+        img.onerror = function() {
+          this.style.display = 'none';
+          t.innerHTML = '<span style="font-size:2rem;opacity:0.5;"></span>';
+        };
+        
+        t.appendChild(img);
+      } else {
+        t.innerHTML = '<span style="font-size:2rem;opacity:0.5;"></span>';
+      }
+      
+      showcase.appendChild(t);
+    });
+    
+    // Animate tiles
     setTimeout(() => {
-      tile.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-      tile.style.opacity = '1';
-      tile.style.transform = 'scale(1)';
-    }, 1000 + i * 80);
-  });
+      const tiles = showcase.querySelectorAll('.ms-tile');
+      tiles.forEach((tile, i) => {
+        tile.style.opacity = '0';
+        tile.style.transform = 'scale(0.5)';
+        setTimeout(() => {
+          tile.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+          tile.style.opacity = '1';
+          tile.style.transform = 'scale(1)';
+        }, i * 80);
+      });
+    }, 100);
+  }
+  
+  // Create tiles immediately and also on window load
+  createMosaicTiles();
+  window.addEventListener('load', createMosaicTiles);
 
   // ============================================================
   // HERO BG MOSAIC PIECES
@@ -1975,33 +2001,49 @@
   // THEME TOGGLE
   // ============================================================
   const themeToggle = document.getElementById('themeToggle');
+  const themeToggleMobile = document.getElementById('themeToggleMobile');
   const savedTheme = localStorage.getItem('mrartTheme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
-  themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+  const updateThemeIcon = (theme) => theme === 'dark' ? '☀️' : '🌙';
+  themeToggle.textContent = updateThemeIcon(savedTheme);
+  if (themeToggleMobile) themeToggleMobile.textContent = updateThemeIcon(savedTheme);
 
-  themeToggle.addEventListener('click', () => {
+  const handleThemeToggle = () => {
     const cur = document.documentElement.getAttribute('data-theme');
     const next = cur === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('mrartTheme', next);
-    themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
-  });
+    const icon = updateThemeIcon(next);
+    themeToggle.textContent = icon;
+    if (themeToggleMobile) themeToggleMobile.textContent = icon;
+  };
+  
+  themeToggle.addEventListener('click', handleThemeToggle);
+  if (themeToggleMobile) themeToggleMobile.addEventListener('click', handleThemeToggle);
 
   // ============================================================
   // RTL TOGGLE
   // ============================================================
   const rtlToggle = document.getElementById('rtlToggle');
+  const rtlToggleMobile = document.getElementById('rtlToggleMobile');
   const savedDir = localStorage.getItem('mrartDir') || 'ltr';
   document.documentElement.setAttribute('dir', savedDir);
-  rtlToggle.textContent = savedDir === 'rtl' ? 'LTR' : 'RTL';
+  const updateRtlText = (dir) => dir === 'rtl' ? 'LTR' : 'RTL';
+  rtlToggle.textContent = updateRtlText(savedDir);
+  if (rtlToggleMobile) rtlToggleMobile.textContent = updateRtlText(savedDir);
 
-  rtlToggle.addEventListener('click', () => {
+  const handleRtlToggle = () => {
     const cur = document.documentElement.getAttribute('dir');
     const next = cur === 'rtl' ? 'ltr' : 'rtl';
     document.documentElement.setAttribute('dir', next);
     localStorage.setItem('mrartDir', next);
-    rtlToggle.textContent = next === 'rtl' ? 'LTR' : 'RTL';
-  });
+    const text = updateRtlText(next);
+    rtlToggle.textContent = text;
+    if (rtlToggleMobile) rtlToggleMobile.textContent = text;
+  };
+  
+  rtlToggle.addEventListener('click', handleRtlToggle);
+  if (rtlToggleMobile) rtlToggleMobile.addEventListener('click', handleRtlToggle);
 
   // ============================================================
   // SCROLL REVEAL

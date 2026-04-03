@@ -160,6 +160,42 @@
     .logo-t3 { background: var(--accent); }
     .logo-t4 { background: var(--mosaic4); }
 
+    /* Theme & RTL Toggles */
+    .card-controls {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .control-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.75rem;
+      color: var(--text2);
+    }
+
+    .control-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    
+    [dir="rtl"] .card-controls {
+      left: 20px;
+      right: auto;
+    }
+
     /* Create Account Text */
     .register-header {
       text-align: center;
@@ -404,8 +440,14 @@
   <!-- Register Container -->
   <div class="register-container">
     <div class="register-card">
+      <!-- Card Controls -->
+      <div class="card-controls">
+        <button class="control-btn" id="themeToggle" title="Toggle Theme">🌙</button>
+        <button class="control-btn" id="rtlToggle" title="Toggle RTL">RTL</button>
+      </div>
+
       <!-- Logo -->
-      <div class="register-logo">
+      <a href="index.html" class="register-logo">
         <div class="logo-icon">
           <span class="logo-t1"></span>
           <span class="logo-t2"></span>
@@ -413,7 +455,7 @@
           <span class="logo-t4"></span>
         </div>
         <span>Mr.Art<span style="color: var(--primary);">.</span></span>
-      </div>
+      </a>
 
       <!-- Create Account Text -->
       <div class="register-header">
@@ -471,11 +513,22 @@
       <!-- Social Buttons -->
       <div class="social-buttons">
         <button type="button" class="btn-social" onclick="handleSocialRegister('google')">
-          <div class="social-icon">🔍</div>
+          <div class="social-icon">
+            <svg width="18" height="18" viewBox="0 0 48 48">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+            </svg>
+          </div>
           <span>Continue with Google</span>
         </button>
         <button type="button" class="btn-social" onclick="handleSocialRegister('facebook')">
-          <div class="social-icon">📘</div>
+          <div class="social-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path>
+            </svg>
+          </div>
           <span>Continue with Facebook</span>
         </button>
       </div>
@@ -541,6 +594,40 @@
       console.log('Social registration with:', provider);
       alert(`${provider} registration would be implemented here`);
     }
+
+    // ============================================================
+    // THEME & RTL TOGGLE
+    // ============================================================
+    const themeToggle = document.getElementById('themeToggle');
+    const rtlToggle = document.getElementById('rtlToggle');
+
+    // Theme logic
+    const savedTheme = localStorage.getItem('mrartTheme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const updateThemeIcon = (theme) => theme === 'dark' ? '☀️' : '🌙';
+    themeToggle.textContent = updateThemeIcon(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('mrartTheme', next);
+      themeToggle.textContent = updateThemeIcon(next);
+    });
+
+    // RTL logic
+    const savedDir = localStorage.getItem('mrartDir') || 'ltr';
+    document.documentElement.setAttribute('dir', savedDir);
+    const updateRtlText = (dir) => dir === 'rtl' ? 'LTR' : 'RTL';
+    rtlToggle.textContent = updateRtlText(savedDir);
+
+    rtlToggle.addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('dir');
+      const next = cur === 'rtl' ? 'ltr' : 'rtl';
+      document.documentElement.setAttribute('dir', next);
+      localStorage.setItem('mrartDir', next);
+      rtlToggle.textContent = updateRtlText(next);
+    });
 
     // Initialize
     createMosaicTiles();
