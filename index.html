@@ -1,0 +1,2167 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mr.Art — Mosaic Artist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       MR.ART — CSS VARIABLES & RESET
+       ============================================================ */
+    :root {
+      --bg: #faf8f5;
+      --bg2: #f0ece4;
+      --text: #1a1008;
+      --text2: #5a4e3c;
+      --text3: #8a7d6a;
+      --primary: #c84b2f;
+      --primary2: #e86843;
+      --secondary: #2d7d6f;
+      --secondary2: #3da494;
+      --accent: #e8b84b;
+      --accent2: #f5d06e;
+      --mosaic1: #c84b2f;
+      --mosaic2: #2d7d6f;
+      --mosaic3: #e8b84b;
+      --mosaic4: #7b3fa0;
+      --mosaic5: #2563a8;
+      --mosaic6: #d45f8a;
+      --card-bg: #ffffff;
+      --border: rgba(26,16,8,0.1);
+      --shadow: 0 8px 40px rgba(26,16,8,0.12);
+      --shadow-lg: 0 20px 80px rgba(26,16,8,0.18);
+      --nav-bg: rgba(250,248,245,0.92);
+      --font-display: 'Playfair Display', serif;
+      --font-title: 'Bebas Neue', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --radius: 12px;
+      --transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    [data-theme="dark"] {
+      --bg: #0f0a06;
+      --bg2: #1a1208;
+      --text: #f5f0e8;
+      --text2: #c8bfb0;
+      --text3: #8a7d6a;
+      --card-bg: #221a10;
+      --border: rgba(245,240,232,0.1);
+      --shadow: 0 8px 40px rgba(0,0,0,0.4);
+      --shadow-lg: 0 20px 80px rgba(0,0,0,0.5);
+      --nav-bg: rgba(15,10,6,0.92);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+      transition: background 0.4s, color 0.4s;
+    }
+    img { max-width: 100%; display: block; }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ============================================================
+       CUSTOM CURSOR
+       ============================================================ */
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--primary);
+      border-radius: 50%;
+      position: fixed; z-index: 99999;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+      mix-blend-mode: multiply;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 2px solid var(--primary);
+      border-radius: 50%;
+      position: fixed; z-index: 99998;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s ease-out, width 0.3s, height 0.3s, opacity 0.3s;
+      opacity: 0.5;
+    }
+    body:hover .cursor { opacity: 1; }
+    @media (max-width: 768px) { .cursor, .cursor-ring { display: none; } }
+
+    /* ============================================================
+       MOSAIC BACKGROUND TILE ANIMATION
+       ============================================================ */
+    .mosaic-bg {
+      position: fixed; inset: 0; z-index: -1;
+      overflow: hidden; pointer-events: none;
+    }
+    .mosaic-tile {
+      position: absolute;
+      border-radius: 4px;
+      opacity: 0;
+      animation: tileFloat linear infinite;
+    }
+    @keyframes tileFloat {
+      0% { opacity: 0; transform: translateY(100vh) rotate(0deg); }
+      10% { opacity: 0.15; }
+      90% { opacity: 0.15; }
+      100% { opacity: 0; transform: translateY(-100px) rotate(360deg); }
+    }
+
+    /* ============================================================
+       NAVBAR
+       ============================================================ */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: var(--nav-bg);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 68px;
+      display: flex; align-items: center;
+      transition: var(--transition), box-shadow 0.3s;
+    }
+    .navbar.scrolled { box-shadow: var(--shadow); }
+
+    .nav-inner {
+      width: 100%; max-width: 1280px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    /* Logo LEFT */
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--font-display);
+      font-size: 1.5rem; font-weight: 700;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+    .nav-logo-icon {
+      width: 36px; height: 36px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 3px;
+      flex-shrink: 0;
+    }
+    .nav-logo-icon span {
+      border-radius: 3px;
+      transition: transform 0.4s;
+    }
+    .nav-logo:hover .nav-logo-icon span { transform: rotate(15deg) scale(1.1); }
+    .logo-t1 { background: var(--primary); }
+    .logo-t2 { background: var(--secondary); }
+    .logo-t3 { background: var(--accent); }
+    .logo-t4 { background: var(--mosaic4); }
+    .logo-dot { color: var(--primary); }
+
+    /* Nav CENTER */
+    .nav-links {
+      display: flex; align-items: center; gap: 6px;
+      position: absolute; left: 50%; transform: translateX(-50%);
+    }
+    .nav-link {
+      font-size: 0.82rem; font-weight: 500; letter-spacing: 0.3px;
+      color: var(--text2);
+      padding: 7px 14px; border-radius: 8px;
+      transition: var(--transition); position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute; bottom: 2px; left: 14px; right: 14px;
+      height: 2px; background: var(--primary);
+      transform: scaleX(0); transform-origin: center;
+      transition: transform 0.3s;
+    }
+    .nav-link:hover { color: var(--primary); background: rgba(200,75,47,0.06); }
+    .nav-link:hover::after { transform: scaleX(1); }
+    .nav-link.active { color: var(--primary); }
+
+    /* Nav RIGHT */
+    .nav-right {
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    }
+    .nav-cta {
+      background: var(--primary);
+      color: #fff;
+      padding: 9px 22px; border-radius: 8px;
+      font-size: 0.82rem; font-weight: 600; letter-spacing: 0.3px;
+      transition: var(--transition); border: none; cursor: pointer;
+      position: relative; overflow: hidden;
+    }
+    .nav-cta::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.2));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .nav-cta:hover { background: var(--primary2); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(200,75,47,0.35); }
+    .nav-cta:hover::before { opacity: 1; }
+
+    .icon-btn {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg2); border: 1px solid var(--border);
+      cursor: pointer; transition: var(--transition); font-size: 0.75rem;
+      color: var(--text2);
+    }
+    .icon-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: scale(1.05); }
+
+    /* Hamburger */
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--text); border-radius: 2px; transition: var(--transition);
+    }
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+    /* Mobile menu */
+    .mobile-menu {
+      position: fixed; top: 68px; left: 0; right: 0;
+      background: var(--nav-bg); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 24px 28px;
+      display: flex; flex-direction: column; gap: 4px;
+      transform: translateY(-120%); opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s;
+      z-index: 999;
+    }
+    .mobile-menu.open { transform: translateY(0); opacity: 1; }
+    .mobile-menu .nav-link { font-size: 0.95rem; padding: 11px 14px; }
+    .mobile-menu .nav-cta { margin-top: 8px; text-align: center; display: block; padding: 12px; }
+
+    @media (max-width: 1023px) { .nav-links { display: none; } }
+    @media (max-width: 1023px) { .hamburger { display: flex; } }
+    @media (max-width: 640px) {
+      .navbar { padding: 0 20px; }
+      .nav-cta.desktop-only { display: none; }
+    }
+
+    /* ============================================================
+       SCROLL REVEAL
+       ============================================================ */
+    .reveal {
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-left { opacity: 0; transform: translateX(-50px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .reveal-left.visible { opacity: 1; transform: none; }
+    .reveal-right { opacity: 0; transform: translateX(50px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .reveal-right.visible { opacity: 1; transform: none; }
+    .reveal-scale { opacity: 0; transform: scale(0.85); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-scale.visible { opacity: 1; transform: scale(1); }
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+    .delay-5 { transition-delay: 0.5s; }
+    .delay-6 { transition-delay: 0.6s; }
+
+    /* ============================================================
+       SECTION BASE
+       ============================================================ */
+    section { padding: 100px 32px; position: relative; overflow: hidden; }
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    .section-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--primary); background: rgba(200,75,47,0.08);
+      padding: 6px 14px; border-radius: 20px;
+      border: 1px solid rgba(200,75,47,0.2);
+      margin-bottom: 16px;
+    }
+    .section-tag::before { content: '◆'; font-size: 0.5rem; }
+
+    /* ALL SECTION HEADINGS CENTERED */
+    .section-header { text-align: center; margin-bottom: 60px; }
+    .section-header .section-tag { margin-bottom: 16px; }
+    .section-header h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700; line-height: 1.15;
+      margin-bottom: 16px; color: var(--text);
+    }
+    .section-header p {
+      font-size: 1.05rem; color: var(--text2);
+      max-width: 580px; margin: 0 auto; line-height: 1.75;
+    }
+
+    /* ============================================================
+       HERO SECTION
+       ============================================================ */
+    #hero {
+      min-height: 100vh;
+      padding: 0;
+      display: flex; align-items: center;
+      position: relative; overflow: hidden;
+      background: var(--bg);
+    }
+
+    .hero-mosaic-bg {
+      position: absolute; inset: 0; z-index: 0; overflow: hidden;
+    }
+    .mosaic-piece {
+      position: absolute;
+      border-radius: 6px;
+      animation: mosaicPulse ease-in-out infinite;
+    }
+    @keyframes mosaicPulse {
+      0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.12; }
+      50% { transform: scale(1.1) rotate(8deg); opacity: 0.22; }
+    }
+
+    .hero-inner {
+      position: relative; z-index: 1;
+      max-width: 1200px; margin: 0 auto; padding: 120px 32px 80px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center;
+    }
+    @media (max-width: 900px) { .hero-inner { grid-template-columns: 1fr; text-align: center; } }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, rgba(200,75,47,0.1), rgba(45,125,111,0.1));
+      border: 1px solid rgba(200,75,47,0.25);
+      padding: 8px 16px; border-radius: 40px;
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--primary); margin-bottom: 24px;
+      animation: fadeInUp 0.8s ease 0.2s both;
+    }
+    .hero-badge-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--primary);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.6);opacity:0.5;} }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 5.5vw, 5rem);
+      font-weight: 900; line-height: 1.08;
+      color: var(--text); margin-bottom: 24px;
+      animation: fadeInUp 0.8s ease 0.3s both;
+    }
+    .hero-title em { font-style: italic; color: var(--primary); }
+    .hero-title .line-through-word { position: relative; display: inline-block; }
+    .hero-title .line-through-word::after {
+      content: '';
+      position: absolute; bottom: 4px; left: 0; right: 0;
+      height: 4px; background: var(--accent);
+      border-radius: 2px;
+      animation: drawLine 1s ease 1s both;
+    }
+    @keyframes drawLine { from{width:0;} to{width:100%;} }
+
+    .hero-desc {
+      font-size: 1.08rem; color: var(--text2); line-height: 1.8;
+      max-width: 500px; margin-bottom: 36px;
+      animation: fadeInUp 0.8s ease 0.45s both;
+    }
+    @media (max-width: 900px) { .hero-desc { margin: 0 auto 36px; } }
+
+    .hero-cta-row {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      animation: fadeInUp 0.8s ease 0.55s both;
+    }
+    @media (max-width: 900px) { .hero-cta-row { justify-content: center; } }
+
+    .btn-primary {
+      background: var(--primary); color: #fff;
+      padding: 14px 32px; border-radius: 10px;
+      font-size: 0.9rem; font-weight: 600; letter-spacing: 0.3px;
+      border: none; cursor: pointer; transition: var(--transition);
+      display: inline-flex; align-items: center; gap: 8px;
+      position: relative; overflow: hidden;
+    }
+    .btn-primary::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.18));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .btn-primary:hover { background: var(--primary2); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(200,75,47,0.38); }
+    .btn-primary:hover::before { opacity: 1; }
+
+    .btn-secondary {
+      background: transparent; color: var(--text);
+      padding: 14px 28px; border-radius: 10px;
+      font-size: 0.9rem; font-weight: 600;
+      border: 2px solid var(--border); cursor: pointer; transition: var(--transition);
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-secondary:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-3px); }
+
+    /* Hero stats */
+    .hero-stats {
+      display: flex; gap: 28px; margin-top: 44px; flex-wrap: wrap;
+      animation: fadeInUp 0.8s ease 0.65s both;
+    }
+    @media (max-width: 900px) { .hero-stats { justify-content: center; } }
+    .hero-stat { text-align: center; }
+    .hero-stat-num {
+      font-family: var(--font-title);
+      font-size: 2.4rem; line-height: 1;
+      color: var(--primary); letter-spacing: 1px;
+    }
+    .hero-stat-label { font-size: 0.75rem; color: var(--text3); letter-spacing: 0.5px; margin-top: 3px; }
+
+    /* Hero visual - mosaic grid */
+    .hero-visual {
+      position: relative; animation: fadeInRight 1s ease 0.4s both;
+    }
+    @keyframes fadeInRight { from{opacity:0;transform:translateX(40px);} to{opacity:1;transform:none;} }
+
+    .mosaic-showcase {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(6, 1fr);
+      gap: 6px;
+      height: 480px;
+      border-radius: 20px; overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+    .ms-tile {
+      border-radius: 4px;
+      overflow: hidden;
+      transition: transform 0.4s, filter 0.4s;
+      cursor: pointer;
+      position: relative;
+    }
+    .ms-tile:hover { transform: scale(1.05); filter: brightness(1.15); z-index: 2; }
+    .ms-tile img { width: 100%; height: 100%; object-fit: cover; }
+    .ms-tile.big { grid-column: span 3; grid-row: span 3; }
+    .ms-tile.med { grid-column: span 2; grid-row: span 2; }
+    .ms-tile.small { grid-column: span 2; grid-row: span 1; }
+    .ms-tile.tall { grid-column: span 1; grid-row: span 3; }
+
+    /* Fallback colored tiles */
+    .ms-tile.c1 { background: linear-gradient(135deg, #c84b2f, #e86843); }
+    .ms-tile.c2 { background: linear-gradient(135deg, #2d7d6f, #3da494); }
+    .ms-tile.c3 { background: linear-gradient(135deg, #e8b84b, #f5d06e); }
+    .ms-tile.c4 { background: linear-gradient(135deg, #7b3fa0, #9b5fc0); }
+    .ms-tile.c5 { background: linear-gradient(135deg, #2563a8, #3d83c8); }
+    .ms-tile.c6 { background: linear-gradient(135deg, #d45f8a, #e47faa); }
+    .ms-tile.c7 { background: linear-gradient(135deg, #5c8a2d, #7caa4d); }
+    .ms-tile.c8 { background: linear-gradient(135deg, #c87d2f, #e89d4f); }
+    .ms-tile.c9 { background: linear-gradient(135deg, #1a5c7a, #2a7c9a); }
+    .ms-tile.c10 { background: linear-gradient(135deg, #8a3a2d, #aa5a4d); }
+
+    /* Animated mosaic tiles overlay */
+    .ms-tile::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .ms-tile:hover::after { opacity: 1; }
+
+    .hero-visual-badge {
+      position: absolute; bottom: 24px; left: 24px;
+      background: var(--card-bg); border-radius: 14px; padding: 16px 20px;
+      box-shadow: var(--shadow); border: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+      animation: floatBadge 4s ease-in-out infinite;
+    }
+    @keyframes floatBadge { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+    .hvb-icon {
+      width: 44px; height: 44px; background: var(--primary);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    .hvb-text { font-size: 0.78rem; font-weight: 600; }
+    .hvb-sub { font-size: 0.68rem; color: var(--text3); margin-top: 2px; }
+
+    .hero-visual-badge2 {
+      position: absolute; top: 24px; right: -10px;
+      background: var(--secondary); color: #fff;
+      border-radius: 12px; padding: 12px 16px;
+      box-shadow: 0 8px 24px rgba(45,125,111,0.35);
+      animation: floatBadge2 3.5s ease-in-out infinite 1s;
+    }
+    @keyframes floatBadge2 { 0%,100%{transform:translateY(0) rotate(-2deg);} 50%{transform:translateY(-10px) rotate(2deg);} }
+    .hvb2-num { font-family: var(--font-title); font-size: 2rem; letter-spacing: 1px; }
+    .hvb2-text { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.5px; opacity: 0.85; }
+
+    @media (max-width: 900px) { .hero-visual { max-width: 500px; margin: 0 auto; } }
+    @media (max-width: 500px) { .mosaic-showcase { height: 300px; gap: 4px; } }
+
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(30px);} to{opacity:1;transform:none;} }
+
+    /* ============================================================
+       ABOUT SECTION
+       ============================================================ */
+    #about { background: var(--bg); }
+
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: center;
+    }
+    @media (max-width: 900px) { .about-grid { grid-template-columns: 1fr; } }
+
+    .about-img-wrap {
+      position: relative;
+    }
+    .about-main-img {
+      width: 100%; height: 520px; object-fit: cover;
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+    }
+    .about-img-fallback {
+      width: 100%; height: 520px; border-radius: 20px;
+      background: linear-gradient(135deg, #c84b2f 0%, #e8b84b 30%, #2d7d6f 60%, #7b3fa0 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem;
+      box-shadow: var(--shadow-lg);
+    }
+    .about-img-badge {
+      position: absolute; bottom: -16px; right: -16px;
+      background: var(--primary); color: #fff;
+      border-radius: 16px; padding: 20px 24px;
+      text-align: center; box-shadow: 0 12px 40px rgba(200,75,47,0.35);
+    }
+    .about-badge-num {
+      font-family: var(--font-title); font-size: 2.4rem; letter-spacing: 1px; line-height: 1;
+    }
+    .about-badge-text { font-size: 0.72rem; font-weight: 600; letter-spacing: 1px; opacity: 0.85; margin-top: 2px; }
+
+    .about-mini-mosaic {
+      position: absolute; top: -16px; left: -16px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+      width: 70px;
+    }
+    .amm { width: 32px; height: 32px; border-radius: 6px; animation: spinIn 0.8s ease backwards; }
+    .amm:nth-child(1) { background: var(--primary); animation-delay: 0.1s; }
+    .amm:nth-child(2) { background: var(--secondary); animation-delay: 0.2s; }
+    .amm:nth-child(3) { background: var(--accent); animation-delay: 0.3s; }
+    .amm:nth-child(4) { background: var(--mosaic4); animation-delay: 0.4s; }
+    @keyframes spinIn { from{opacity:0;transform:rotate(-180deg) scale(0);} to{opacity:1;transform:none;} }
+
+    /* ALL ABOUT TEXT CENTERED */
+    .about-text { text-align: center; }
+    .about-text .section-tag { display: inline-flex; }
+    .about-text h2 { font-family: var(--font-display); font-size: clamp(1.8rem,3vw,2.6rem); font-weight: 700; line-height: 1.2; margin-bottom: 18px; }
+    .about-text p { color: var(--text2); line-height: 1.8; margin-bottom: 20px; font-size: 1rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+
+    .skills-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 28px;
+    }
+    .skill-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; border-radius: 10px;
+      background: var(--bg2); border: 1px solid var(--border);
+      font-size: 0.85rem; font-weight: 500;
+      transition: var(--transition); justify-content: center;
+    }
+    .skill-item:hover { background: rgba(200,75,47,0.08); border-color: var(--primary); color: var(--primary); }
+    .skill-icon { font-size: 1rem; }
+
+    /* ============================================================
+       SERVICES SECTION
+       ============================================================ */
+    #services { background: var(--bg2); }
+
+    .services-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+    @media (min-width: 768px) and (max-width: 1023px) { .services-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 767px) { .services-grid { grid-template-columns: 1fr; } }
+
+    .service-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 32px 28px;
+      text-align: center;
+      transition: var(--transition);
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .service-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .service-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: transparent; }
+    .service-card:hover::before { transform: scaleX(1); }
+
+    .service-icon-wrap {
+      width: 68px; height: 68px; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; margin-bottom: 20px;
+      transition: transform 0.4s;
+    }
+    .service-card:hover .service-icon-wrap { transform: rotate(10deg) scale(1.1); }
+    .si-1 { background: linear-gradient(135deg, rgba(200,75,47,0.15), rgba(232,104,67,0.1)); }
+    .si-2 { background: linear-gradient(135deg, rgba(45,125,111,0.15), rgba(61,164,148,0.1)); }
+    .si-3 { background: linear-gradient(135deg, rgba(232,184,75,0.15), rgba(245,208,110,0.1)); }
+    .si-4 { background: linear-gradient(135deg, rgba(123,63,160,0.15), rgba(155,95,192,0.1)); }
+    .si-5 { background: linear-gradient(135deg, rgba(37,99,168,0.15), rgba(61,131,200,0.1)); }
+    .si-6 { background: linear-gradient(135deg, rgba(212,95,138,0.15), rgba(228,127,170,0.1)); }
+
+    .service-card h3 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; margin-bottom: 12px; color: var(--text); text-align: center; }
+    .service-card p { font-size: 0.9rem; color: var(--text2); line-height: 1.7; text-align: center; }
+    .service-price {
+      margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
+      font-size: 0.82rem; color: var(--text3); text-align: center;
+    }
+    .service-price strong { color: var(--primary); font-size: 1.1rem; font-weight: 700; }
+
+    /* ============================================================
+       PORTFOLIO SECTION
+       ============================================================ */
+    #portfolio { background: var(--bg); }
+
+    .portfolio-filters {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      justify-content: center; margin-bottom: 44px;
+    }
+    .filter-btn {
+      padding: 8px 20px; border-radius: 20px; font-size: 0.82rem; font-weight: 500;
+      border: 1.5px solid var(--border); background: transparent;
+      color: var(--text2); cursor: pointer; transition: var(--transition);
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--primary); color: #fff; border-color: var(--primary);
+      box-shadow: 0 4px 16px rgba(200,75,47,0.3);
+    }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (min-width: 768px) and (max-width: 1023px) { .portfolio-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 767px) { .portfolio-grid { grid-template-columns: 1fr; } }
+
+    .portfolio-item {
+      border-radius: 14px; overflow: hidden;
+      position: relative; cursor: pointer;
+      aspect-ratio: 4/3;
+      transition: transform 0.4s;
+    }
+    .portfolio-item:hover { transform: scale(1.02); }
+
+    .portfolio-img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .portfolio-item:hover .portfolio-img { transform: scale(1.08); }
+
+    /* Fallback colored portfolio items */
+    .pi-fallback {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem;
+      position: relative;
+    }
+    .pi-1 { background: linear-gradient(135deg, #c84b2f, #e8b84b, #2d7d6f); }
+    .pi-2 { background: linear-gradient(135deg, #2d7d6f, #2563a8, #7b3fa0); }
+    .pi-3 { background: linear-gradient(135deg, #e8b84b, #d45f8a, #c84b2f); }
+    .pi-4 { background: linear-gradient(135deg, #7b3fa0, #2563a8, #2d7d6f); }
+    .pi-5 { background: linear-gradient(135deg, #d45f8a, #c84b2f, #e8b84b); }
+    .pi-6 { background: linear-gradient(135deg, #2563a8, #2d7d6f, #e8b84b); }
+
+    .portfolio-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(0deg, rgba(26,16,8,0.85) 0%, rgba(26,16,8,0.2) 60%, transparent 100%);
+      opacity: 0; transition: opacity 0.4s;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 24px; text-align: center; align-items: center;
+    }
+    .portfolio-item:hover .portfolio-overlay { opacity: 1; }
+    .po-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .po-tag { font-size: 0.75rem; color: rgba(255,255,255,0.75); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+    .po-btn {
+      background: var(--primary); color: #fff;
+      padding: 8px 20px; border-radius: 8px; font-size: 0.78rem; font-weight: 600;
+      transition: var(--transition);
+    }
+    .po-btn:hover { background: var(--primary2); transform: scale(1.05); }
+
+    /* Portfolio Feature row */
+    .portfolio-feature {
+      margin-top: 20px;
+      display: grid; grid-template-columns: 2fr 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 767px) { .portfolio-feature { grid-template-columns: 1fr; } }
+    .pf-main { grid-column: 1; grid-row: span 2; aspect-ratio: auto; min-height: 320px; }
+    .pf-sm { aspect-ratio: 16/10; }
+
+    /* ============================================================
+       PROCESS SECTION
+       ============================================================ */
+    #process { background: var(--bg2); }
+
+    .process-steps {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+      position: relative;
+    }
+    @media (min-width: 768px) and (max-width: 1023px) { .process-steps { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 767px) { .process-steps { grid-template-columns: 1fr; } }
+
+    .process-steps::before {
+      content: '';
+      position: absolute; top: 50px; left: 12.5%; right: 12.5%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary), var(--mosaic4));
+      border-radius: 2px;
+    }
+    @media (max-width: 1023px) { .process-steps::before { display: none; } }
+
+    .process-step {
+      text-align: center;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 28px 20px; border-radius: 16px;
+      background: var(--card-bg); border: 1px solid var(--border);
+      transition: var(--transition); position: relative;
+    }
+    .process-step:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
+
+    .step-num {
+      width: 56px; height: 56px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-title); font-size: 1.4rem; color: #fff;
+      margin-bottom: 20px; position: relative; z-index: 1;
+      transition: transform 0.4s;
+    }
+    .process-step:hover .step-num { transform: scale(1.15) rotate(10deg); }
+    .sn-1 { background: linear-gradient(135deg, var(--primary), var(--primary2)); box-shadow: 0 6px 20px rgba(200,75,47,0.35); }
+    .sn-2 { background: linear-gradient(135deg, var(--secondary), var(--secondary2)); box-shadow: 0 6px 20px rgba(45,125,111,0.35); }
+    .sn-3 { background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 6px 20px rgba(232,184,75,0.35); color: #1a1008; }
+    .sn-4 { background: linear-gradient(135deg, var(--mosaic4), #9b5fc0); box-shadow: 0 6px 20px rgba(123,63,160,0.35); }
+
+    .process-step h3 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; text-align: center; }
+    .process-step p { font-size: 0.88rem; color: var(--text2); line-height: 1.65; text-align: center; }
+
+    /* ============================================================
+       TESTIMONIALS
+       ============================================================ */
+    #testimonials { background: var(--bg); }
+
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+    @media (min-width: 768px) and (max-width: 1023px) { .testimonials-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 767px) { .testimonials-grid { grid-template-columns: 1fr; } }
+
+    .testimonial-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px;
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      transition: var(--transition); position: relative; overflow: hidden;
+    }
+    .testimonial-card::after {
+      content: '\201C';
+      position: absolute; top: 12px; right: 20px;
+      font-family: var(--font-display); font-size: 5rem;
+      color: var(--primary); opacity: 0.07; line-height: 1;
+    }
+    .testimonial-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: var(--primary); }
+    .tc-stars { color: var(--accent); font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 14px; }
+    .tc-text { font-size: 0.92rem; color: var(--text2); line-height: 1.75; font-style: italic; margin-bottom: 20px; }
+    .tc-author { display: flex; align-items: center; gap: 12px; justify-content: center; }
+    .tc-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.9rem; color: #fff; flex-shrink: 0;
+    }
+    .ta-1 { background: linear-gradient(135deg, var(--primary), var(--primary2)); }
+    .ta-2 { background: linear-gradient(135deg, var(--secondary), var(--secondary2)); }
+    .ta-3 { background: linear-gradient(135deg, var(--mosaic4), #9b5fc0); }
+    .ta-4 { background: linear-gradient(135deg, var(--mosaic5), #3d83c8); }
+    .ta-5 { background: linear-gradient(135deg, var(--mosaic6), #e47faa); }
+    .ta-6 { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #1a1008; }
+    .tc-name { font-weight: 600; font-size: 0.88rem; }
+    .tc-role { font-size: 0.75rem; color: var(--text3); }
+
+    /* ============================================================
+       STATS SECTION
+       ============================================================ */
+    #stats {
+      background: linear-gradient(135deg, var(--primary) 0%, #a0361f 40%, var(--secondary) 100%);
+      padding: 80px 32px;
+    }
+    .stats-inner { max-width: 900px; margin: 0 auto; }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px;
+      text-align: center;
+    }
+    @media (min-width: 768px) and (max-width: 1023px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 767px) { .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
+
+    .stat-item { color: #fff; }
+    .stat-num {
+      font-family: var(--font-title); font-size: clamp(2.5rem, 5vw, 4rem);
+      letter-spacing: 1px; line-height: 1;
+      display: block; margin-bottom: 8px;
+    }
+    .stat-label { font-size: 0.82rem; opacity: 0.82; letter-spacing: 0.5px; }
+
+    /* ============================================================
+       CONTACT SECTION
+       ============================================================ */
+    #contact { background: var(--bg2); }
+
+    .contact-grid {
+      display: grid; grid-template-columns: 1fr 1.4fr; gap: 60px; align-items: start;
+    }
+    @media (max-width: 900px) { .contact-grid { grid-template-columns: 1fr; } }
+
+    /* ALL CONTACT TEXT CENTERED */
+    .contact-info { text-align: center; }
+    .contact-info .section-tag { display: inline-flex; }
+    .contact-info h2 { font-family: var(--font-display); font-size: clamp(1.8rem,3vw,2.6rem); font-weight: 700; line-height: 1.2; margin-bottom: 16px; }
+    .contact-info p { color: var(--text2); line-height: 1.8; margin-bottom: 28px; }
+
+    .contact-items { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+    .contact-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 20px; border-radius: 12px;
+      background: var(--card-bg); border: 1px solid var(--border);
+      transition: var(--transition); width: 100%; max-width: 320px;
+    }
+    .contact-item:hover { border-color: var(--primary); transform: translateX(4px); }
+    .ci-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .ci-1 { background: rgba(200,75,47,0.12); }
+    .ci-2 { background: rgba(45,125,111,0.12); }
+    .ci-3 { background: rgba(123,63,160,0.12); }
+    .ci-4 { background: rgba(232,184,75,0.12); }
+    .ci-label { font-size: 0.7rem; color: var(--text3); letter-spacing: 0.5px; }
+    .ci-value { font-size: 0.9rem; font-weight: 500; color: var(--text); margin-top: 2px; }
+
+    /* Contact Form */
+    .contact-form {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 20px; padding: 36px;
+      box-shadow: var(--shadow);
+    }
+    .contact-form h3 {
+      font-family: var(--font-display); font-size: 1.4rem; font-weight: 700;
+      margin-bottom: 24px; text-align: center;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.5px;
+      color: var(--text2); margin-bottom: 7px;
+    }
+    .form-input {
+      width: 100%; padding: 12px 15px; border-radius: 10px;
+      border: 1.5px solid var(--border); background: var(--bg);
+      color: var(--text); font-family: var(--font-body); font-size: 0.9rem;
+      transition: var(--transition); outline: none;
+    }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(200,75,47,0.1); background: var(--bg2); }
+    .form-input::placeholder { color: var(--text3); }
+    textarea.form-input { resize: vertical; min-height: 120px; }
+    select.form-input { cursor: pointer; appearance: none; }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    footer {
+      background: var(--text);
+      color: rgba(245,240,232,0.85);
+      padding: 60px 32px 32px;
+    }
+    [data-theme="light"] footer { background: #1a1008; }
+    [data-theme="dark"] footer { background: #080503; }
+
+    .footer-inner { max-width: 1200px; margin: 0 auto; }
+    .footer-top {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
+      margin-bottom: 48px;
+    }
+    @media (max-width: 900px) { .footer-top { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) { .footer-top { grid-template-columns: 1fr; } }
+
+    .footer-brand .nav-logo { color: #f5f0e8; margin-bottom: 14px; }
+    .footer-brand p { font-size: 0.88rem; line-height: 1.75; opacity: 0.65; max-width: 260px; }
+
+    .footer-socials { display: flex; gap: 10px; margin-top: 20px; }
+    .social-btn {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(245,240,232,0.08); border: 1px solid rgba(245,240,232,0.12);
+      color: rgba(245,240,232,0.7); font-size: 0.85rem;
+      transition: var(--transition); cursor: pointer; text-decoration: none;
+    }
+    .social-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-3px); }
+
+    .footer-col h4 {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--primary); margin-bottom: 16px;
+    }
+    .footer-col ul { display: flex; flex-direction: column; gap: 10px; }
+    .footer-col li a {
+      font-size: 0.88rem; opacity: 0.65; transition: var(--transition);
+      color: inherit;
+    }
+    .footer-col li a:hover { opacity: 1; color: var(--accent); padding-left: 6px; }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(245,240,232,0.08);
+      padding-top: 24px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      font-size: 0.82rem; opacity: 0.5;
+    }
+
+    /* ============================================================
+       MOSAIC ANIMATED DIVIDER
+       ============================================================ */
+    .mosaic-divider {
+      height: 6px;
+      background: linear-gradient(90deg,
+        var(--primary) 0%, var(--primary) 16.66%,
+        var(--accent) 16.66%, var(--accent) 33.33%,
+        var(--secondary) 33.33%, var(--secondary) 50%,
+        var(--mosaic4) 50%, var(--mosaic4) 66.66%,
+        var(--mosaic5) 66.66%, var(--mosaic5) 83.33%,
+        var(--mosaic6) 83.33%, var(--mosaic6) 100%
+      );
+      background-size: 200% 100%;
+      animation: dividerSlide 4s linear infinite;
+    }
+    @keyframes dividerSlide { 0%{background-position:0 0;} 100%{background-position:200% 0;} }
+
+    /* ============================================================
+       SCROLL TO TOP
+       ============================================================ */
+    .scroll-top {
+      position: fixed; bottom: 28px; right: 28px; z-index: 100;
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--primary); color: #fff; border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem;
+      transition: var(--transition);
+      opacity: 0; transform: translateY(10px);
+      box-shadow: 0 4px 20px rgba(200,75,47,0.4);
+    }
+    .scroll-top.visible { opacity: 1; transform: translateY(0); }
+    .scroll-top:hover { background: var(--primary2); transform: translateY(-3px); }
+
+    /* ============================================================
+       LIGHTBOX
+       ============================================================ */
+    .lightbox {
+      position: fixed; inset: 0; z-index: 10000;
+      background: rgba(10,6,2,0.92);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+      padding: 20px;
+    }
+    .lightbox.open { opacity: 1; pointer-events: all; }
+    .lightbox-img {
+      max-width: 90vw; max-height: 85vh; border-radius: 12px;
+      object-fit: contain; transform: scale(0.9);
+      transition: transform 0.3s;
+    }
+    .lightbox.open .lightbox-img { transform: scale(1); }
+    .lightbox-close {
+      position: absolute; top: 20px; right: 20px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; font-size: 1.2rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+    }
+    .lightbox-close:hover { background: var(--primary); }
+
+    /* ============================================================
+       LOADING ANIMATION
+       ============================================================ */
+    .page-loader {
+      position: fixed; inset: 0; z-index: 99999;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.6s, visibility 0.6s;
+    }
+    .page-loader.hidden { opacity: 0; visibility: hidden; }
+    .loader-mosaic {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 80px;
+    }
+    .loader-tile {
+      width: 18px; height: 18px; border-radius: 4px;
+      animation: loaderPop 1.2s ease-in-out infinite;
+    }
+    .lt-1 { background: var(--primary); animation-delay: 0s; }
+    .lt-2 { background: var(--secondary); animation-delay: 0.15s; }
+    .lt-3 { background: var(--accent); animation-delay: 0.3s; }
+    .lt-4 { background: var(--mosaic4); animation-delay: 0.45s; }
+    .lt-5 { background: var(--mosaic5); animation-delay: 0.6s; }
+    .lt-6 { background: var(--mosaic6); animation-delay: 0.75s; }
+    .lt-7 { background: var(--secondary2); animation-delay: 0.9s; }
+    .lt-8 { background: var(--primary2); animation-delay: 1.05s; }
+    @keyframes loaderPop { 0%,100%{transform:scale(0.6);opacity:0.3;} 50%{transform:scale(1.2);opacity:1;} }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 768px) {
+      section { padding: 70px 20px; }
+      .hero-inner { padding: 100px 20px 60px; gap: 40px; }
+      .about-grid { gap: 40px; }
+      .hero-visual-badge2 { display: none; }
+    }
+    @media (max-width: 360px) {
+      .hero-title { font-size: 2.2rem; }
+      .hero-stats { gap: 18px; }
+      .skills-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ============================================================
+       HIGHLIGHT ANIMATED SPANS
+       ============================================================ */
+    .highlight {
+      position: relative; display: inline-block;
+      color: var(--primary);
+    }
+    .highlight::after {
+      content: '';
+      position: absolute; bottom: -2px; left: 0; right: 0;
+      height: 3px; background: var(--accent); border-radius: 2px;
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.6s ease;
+    }
+    .highlight.animated::after { transform: scaleX(1); }
+
+    /* ============================================================
+       GRADIENT TEXT
+       ============================================================ */
+    .grad-text {
+      background: linear-gradient(135deg, var(--primary), var(--accent), var(--secondary));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200%; animation: gradShift 4s ease infinite;
+    }
+    @keyframes gradShift { 0%,100%{background-position:0%} 50%{background-position:100%} }
+
+    /* Floating shapes */
+    .float-shape {
+      position: absolute; border-radius: 6px; pointer-events: none;
+      animation: floatShape ease-in-out infinite;
+    }
+    @keyframes floatShape { 0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-20px) rotate(15deg);} }
+
+    /* Section separator tiles */
+    .tile-separator {
+      display: flex; gap: 6px; justify-content: center; padding: 12px 0;
+    }
+    .ts { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+
+    /* Notification toast */
+    .toast {
+      position: fixed; bottom: 80px; right: 28px; z-index: 9999;
+      background: var(--secondary); color: #fff;
+      padding: 14px 20px; border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(45,125,111,0.4);
+      font-size: 0.88rem; font-weight: 500;
+      transform: translateX(120%); transition: transform 0.4s;
+      max-width: 280px;
+    }
+    .toast.show { transform: translateX(0); }
+  </style>
+</head>
+<body>
+
+<!-- PAGE LOADER -->
+<div class="page-loader" id="loader">
+  <div class="loader-mosaic">
+    <div class="loader-tile lt-1"></div>
+    <div class="loader-tile lt-2"></div>
+    <div class="loader-tile lt-3"></div>
+    <div class="loader-tile lt-4"></div>
+    <div class="loader-tile lt-5"></div>
+    <div class="loader-tile lt-6"></div>
+    <div class="loader-tile lt-7"></div>
+    <div class="loader-tile lt-8"></div>
+  </div>
+</div>
+
+<!-- CUSTOM CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- MOSAIC BACKGROUND -->
+<div class="mosaic-bg" id="mosaicBg"></div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <img class="lightbox-img" id="lightboxImg" alt="Portfolio Item">
+  <button class="lightbox-close" id="lightboxClose">✕</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ Message sent! I'll reply within 24 hours.</div>
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <!-- LEFT: Logo -->
+    <a href="#hero" class="nav-logo">
+      <div class="nav-logo-icon">
+        <span class="logo-t1"></span>
+        <span class="logo-t2"></span>
+        <span class="logo-t3"></span>
+        <span class="logo-t4"></span>
+      </div>
+      Mr<span class="logo-dot">.</span>Art
+    </a>
+
+    <!-- CENTER: Nav links (desktop) -->
+    <div class="nav-links" id="navLinks">
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#portfolio" class="nav-link">Portfolio</a>
+      <a href="#process" class="nav-link">Process</a>
+      <a href="#testimonials" class="nav-link">Testimonials</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </div>
+
+    <!-- RIGHT: Controls -->
+    <div class="nav-right">
+      <button class="nav-cta desktop-only" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+        Hire Me
+      </button>
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
+      <button class="icon-btn" id="rtlToggle" title="Toggle RTL" style="font-size:0.72rem;letter-spacing:0.5px;font-weight:600;">RTL</button>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+    <a href="#home" class="nav-link" onclick="closeMobileMenu()">Home</a>
+  <a href="#about" class="nav-link" onclick="closeMobileMenu()">About</a>
+  <a href="#services" class="nav-link" onclick="closeMobileMenu()">Services</a>
+  <a href="#portfolio" class="nav-link" onclick="closeMobileMenu()">Portfolio</a>
+  <a href="#process" class="nav-link" onclick="closeMobileMenu()">Process</a>
+  <a href="#testimonials" class="nav-link" onclick="closeMobileMenu()">Testimonials</a>
+  <a href="#contact" class="nav-link" onclick="closeMobileMenu()">Contact</a>
+  <a href="#contact" class="nav-cta" onclick="closeMobileMenu()">✉ Hire Me</a>
+</div>
+
+<!-- MOSAIC DIVIDER -->
+<div class="mosaic-divider"></div>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section id="hero">
+  <div class="hero-mosaic-bg" id="heroMosaicBg"></div>
+
+  <div class="hero-inner">
+    <!-- LEFT: Text -->
+    <div class="hero-left">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Available for New Projects
+      </div>
+
+      <h1 class="hero-title">
+        Crafting <em>Stories</em><br/>
+        in <span class="line-through-word grad-text">Mosaic</span><br/>
+        &amp; <span class="highlight">Color</span>
+      </h1>
+
+      <p class="hero-desc">
+        Transforming homes, gardens, and spaces with handcrafted mosaic art. Each piece is a unique
+        conversation between stone, glass, and light — made to last generations.
+      </p>
+
+      <div class="hero-cta-row">
+        <button class="btn-primary" onclick="document.getElementById('portfolio').scrollIntoView({behavior:'smooth'})">
+          🎨 View My Work
+        </button>
+        <button class="btn-secondary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+          💬 Let's Talk
+        </button>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-num" data-count="240">0</span>
+          <div class="hero-stat-label">Projects Done</div>
+        </div>
+        <div class="hero-stat" style="border-left:1px solid var(--border);padding-left:28px;">
+          <span class="hero-stat-num" data-count="14">0</span>
+          <div class="hero-stat-label">Years Experience</div>
+        </div>
+        <div class="hero-stat" style="border-left:1px solid var(--border);padding-left:28px;">
+          <span class="hero-stat-num" data-count="98" data-suffix="%">0</span>
+          <div class="hero-stat-label">Happy Clients</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Mosaic showcase -->
+    <div class="hero-visual">
+      <div class="mosaic-showcase" id="mosaicShowcase">
+        <!-- Tiles filled by JS -->
+      </div>
+
+      <div class="hero-visual-badge">
+        <div class="hvb-icon">🏆</div>
+        <div>
+          <div class="hvb-text">Award Winning Artist</div>
+          <div class="hvb-sub">National Art Guild 2023</div>
+        </div>
+      </div>
+
+      <div class="hero-visual-badge2">
+        <div class="hvb2-num">4.9★</div>
+        <div class="hvb2-text">CLIENT RATING</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION SEPARATOR -->
+<div class="tile-separator">
+  <div class="ts" style="background:var(--primary)"></div>
+  <div class="ts" style="background:var(--accent)"></div>
+  <div class="ts" style="background:var(--secondary)"></div>
+  <div class="ts" style="background:var(--mosaic4)"></div>
+  <div class="ts" style="background:var(--mosaic5)"></div>
+  <div class="ts" style="background:var(--mosaic6)"></div>
+  <div class="ts" style="background:var(--primary2)"></div>
+  <div class="ts" style="background:var(--secondary2)"></div>
+</div>
+
+<!-- ============================================================
+     ABOUT
+     ============================================================ -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <!-- Image -->
+      <div class="about-img-wrap reveal-left">
+        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=520&fit=crop&auto=format" alt="Mosaic Artist at Work" class="about-main-img">
+        <div class="about-img-badge">
+          <div class="about-badge-num">14+</div>
+          <div class="about-badge-text">YEARS CRAFTING</div>
+        </div>
+        <div class="about-mini-mosaic">
+          <div class="amm"></div>
+          <div class="amm"></div>
+          <div class="amm"></div>
+          <div class="amm"></div>
+        </div>
+      </div>
+
+      <!-- Text — ALL CENTERED -->
+      <div class="about-text reveal-right">
+        <div class="section-tag">About Mr.Art</div>
+        <h2>Where Every Fragment<br/>Tells a <span class="grad-text">Story</span></h2>
+        <p>
+          I'm Marco — a passionate mosaic artist based in Florence, Italy. For over 14 years, I've been transforming
+          ordinary spaces into extraordinary expressions of color, texture, and meaning.
+        </p>
+        <p>
+          My work spans from intimate home interiors to sprawling garden installations, each piece hand-laid
+          with Italian glass, natural stone, and ceramic tesserae. I believe mosaic is the oldest form of
+          storytelling — and every home deserves its own story.
+        </p>
+
+        <div class="skills-grid">
+          <div class="skill-item reveal delay-1"><span class="skill-icon">🪟</span> Italian Glass Mosaic</div>
+          <div class="skill-item reveal delay-2"><span class="skill-icon">🪨</span> Natural Stone Work</div>
+          <div class="skill-item reveal delay-3"><span class="skill-icon">🌿</span> Garden Installations</div>
+          <div class="skill-item reveal delay-4"><span class="skill-icon">🏠</span> Interior Murals</div>
+          <div class="skill-item reveal delay-5"><span class="skill-icon">🎭</span> Custom Commissions</div>
+          <div class="skill-item reveal delay-6"><span class="skill-icon">♻️</span> Eco-Friendly Art</div>
+        </div>
+
+        <button class="btn-primary" style="margin-top:28px;" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+          Commission a Piece →
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SERVICES
+     ============================================================ -->
+<section id="services">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">What I Create</div>
+      <h2>Mosaic Services for <span class="grad-text">Every Space</span></h2>
+      <p>From intimate table-tops to grand garden walls, I craft bespoke mosaic art tailored to your vision, your space, and your soul.</p>
+    </div>
+
+    <div class="services-grid">
+      <div class="service-card reveal delay-1">
+        <div class="service-icon-wrap si-1">
+          <img src="https://images.unsplash.com/photo-1578912681005-fb4b1e0c8576?w=80&h=80&fit=crop&auto=format" alt="Interior Murals" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+        </div>
+        <h3>Interior Murals</h3>
+        <p>Transform your kitchen backsplash, bathroom wall, or living room focal point into a breathtaking mosaic narrative that becomes the heart of your home.</p>
+        <div class="service-price">From <strong>$800</strong> per sq. meter</div>
+      </div>
+
+      <div class="service-card reveal delay-2">
+        <div class="service-icon-wrap si-2">
+          <img src="https://images.unsplash.com/photo-1585238342024-78a38b9ae233?w=80&h=80&fit=crop&auto=format" alt="Garden Art" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+        </div>
+        <h3>Garden Art</h3>
+        <p>Weather-resistant mosaic installations for gardens, patios, and outdoor spaces. Each piece designed to harmonize with nature and withstand the elements.</p>
+        <div class="service-price">From <strong>$1,200</strong> per sq. meter</div>
+      </div>
+
+      <div class="service-card reveal delay-3">
+        <div class="service-icon-wrap si-3">
+          <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=80&h=80&fit=crop&auto=format" alt="Framed Pieces" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+        </div>
+        <h3>Framed Pieces</h3>
+        <p>Gallery-ready mosaic artworks perfect for collectors and art enthusiasts. Each piece comes with custom framing and certificate of authenticity.</p>
+        <div class="service-price">From <strong>$2,500</strong> per piece</div>
+      </div>
+
+      <div class="service-card reveal delay-1">
+        <div class="service-icon-wrap si-4">
+          <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=80&h=80&fit=crop&auto=format" alt="Pool & Fountain" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+        </div>
+        <h3>Pool & Fountain</h3>
+        <p>Underwater mosaics and water feature designs that create stunning visual effects. Specialized waterproof materials ensure longevity and beauty.</p>
+        <div class="service-price">From <strong>$1,500</strong> per sq. meter</div>
+      </div>
+
+      <div class="service-card reveal delay-2">
+        <div class="service-icon-wrap si-5">
+          <img src="https://images.unsplash.com/photo-1448630360428-65456885c650?w=80&h=80&fit=crop&auto=format" alt="Commercial" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+        </div>
+        <h3>Commercial</h3>
+        <p>Large-scale installations for hotels, restaurants, offices, and public spaces. Brand integration and architectural harmony are my specialties.</p>
+        <div class="service-price">From <strong>$1,000</strong> per sq. meter</div>
+      </div>
+
+      <div class="service-card reveal delay-3">
+        <div class="service-icon-wrap si-6">
+          <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=80&h=80&fit=crop&auto=format" alt="Workshops" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+        </div>
+        <h3>Workshops</h3>
+        <p>Learn the ancient art of mosaic-making in my Florence studio. Private and group sessions available for all skill levels, from beginners to advanced.</p>
+        <div class="service-price">From <strong>$150</strong> per session</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PORTFOLIO
+     ============================================================ -->
+<section id="portfolio">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">My Work</div>
+      <h2>A Mosaic of <span class="grad-text">Completed Projects</span></h2>
+      <p>Every piece is one-of-a-kind. Explore a selection of recent commissions for homes, gardens, and public spaces across Europe and beyond.</p>
+    </div>
+
+    <div class="portfolio-filters reveal">
+      <button class="filter-btn active" data-filter="all">All Work</button>
+      <button class="filter-btn" data-filter="interior">Interiors</button>
+      <button class="filter-btn" data-filter="garden">Garden</button>
+      <button class="filter-btn" data-filter="framed">Framed Art</button>
+      <button class="filter-btn" data-filter="commercial">Commercial</button>
+    </div>
+
+    <div class="portfolio-grid" id="portfolioGrid">
+      <div class="portfolio-item reveal delay-1" data-category="interior">
+        <img src="https://images.unsplash.com/photo-1578912681005-fb4b1e0c8576?w=600&h=450&fit=crop&auto=format" alt="Tuscan Kitchen Backsplash" class="portfolio-img">
+        <div class="portfolio-overlay">
+          <div class="po-title">Tuscan Kitchen Backsplash</div>
+          <div class="po-tag">Interior · Italian Glass</div>
+          <span class="po-btn">View Project →</span>
+        </div>
+      </div>
+
+      <div class="portfolio-item reveal delay-2" data-category="garden">
+        <img src="https://images.unsplash.com/photo-1585238342024-78a38b9ae233?w=600&h=450&fit=crop&auto=format" alt="Midnight Garden Wall" class="portfolio-img">
+        <div class="portfolio-overlay">
+          <div class="po-title">Midnight Garden Wall</div>
+          <div class="po-tag">Garden · Natural Stone</div>
+          <span class="po-btn">View Project →</span>
+        </div>
+      </div>
+
+      <div class="portfolio-item reveal delay-3" data-category="framed">
+        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=450&fit=crop&auto=format" alt="Butterfly Serenade" class="portfolio-img">
+        <div class="portfolio-overlay">
+          <div class="po-title">Butterfly Serenade</div>
+          <div class="po-tag">Framed · Mixed Media</div>
+          <span class="po-btn">View Project →</span>
+        </div>
+      </div>
+
+      <div class="portfolio-item reveal delay-1" data-category="commercial">
+        <img src="https://images.unsplash.com/photo-1448630360428-65456885c650?w=600&h=450&fit=crop&auto=format" alt="Hotel Lobby Feature Wall" class="portfolio-img">
+        <div class="portfolio-overlay">
+          <div class="po-title">Hotel Lobby Feature Wall</div>
+          <div class="po-tag">Commercial · Grand Scale</div>
+          <span class="po-btn">View Project →</span>
+        </div>
+      </div>
+
+      <div class="portfolio-item reveal delay-2" data-category="interior">
+        <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=600&h=450&fit=crop&auto=format" alt="Spa Sanctuary Mural" class="portfolio-img">
+        <div class="portfolio-overlay">
+          <div class="po-title">Spa Sanctuary Mural</div>
+          <div class="po-tag">Interior · Ceramic</div>
+          <span class="po-btn">View Project →</span>
+        </div>
+      </div>
+
+      <div class="portfolio-item reveal delay-3" data-category="garden">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=450&fit=crop&auto=format" alt="Villa Fountain Panel" class="portfolio-img">
+        <div class="portfolio-overlay">
+          <div class="po-title">Villa Fountain Panel</div>
+          <div class="po-tag">Garden · Waterproof Glass</div>
+          <span class="po-btn">View Project →</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:44px;" class="reveal">
+      <button class="btn-secondary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+        🖼 Commission Your Piece
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATS
+     ============================================================ -->
+<section id="stats" style="padding:80px 32px;">
+  <div class="stats-inner container">
+    <div class="section-header reveal" style="margin-bottom:44px;">
+      <h2 style="color:#fff;font-family:var(--font-display);">The Numbers Behind<br/><span style="color:var(--accent);">Every Tile</span></h2>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-item reveal delay-1">
+        <span class="stat-num" data-count="240" data-suffix="+">0</span>
+        <div class="stat-label">Projects Completed</div>
+      </div>
+      <div class="stat-item reveal delay-2">
+        <span class="stat-num" data-count="14" data-suffix="+">0</span>
+        <div class="stat-label">Years of Craft</div>
+      </div>
+      <div class="stat-item reveal delay-3">
+        <span class="stat-num" data-count="18">0</span>
+        <div class="stat-label">Countries Reached</div>
+      </div>
+      <div class="stat-item reveal delay-4">
+        <span class="stat-num" data-count="12">0</span>
+        <div class="stat-label">Awards Won</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROCESS
+     ============================================================ -->
+<section id="process">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">How It Works</div>
+      <h2>From <span class="grad-text">Vision to Mosaic</span></h2>
+      <p>A seamless, collaborative journey from your first idea to the final installation. I guide you through every step with care and expertise.</p>
+    </div>
+
+    <div class="process-steps">
+      <div class="process-step reveal delay-1">
+        <div class="step-num sn-1">01</div>
+        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=300&h=200&fit=crop&auto=format" alt="Discovery Call" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:16px;">
+        <h3>Discovery Call</h3>
+        <p>We discuss your space, vision, color palette, and budget. I listen deeply to understand the story you want your mosaic to tell.</p>
+      </div>
+      <div class="process-step reveal delay-2">
+        <div class="step-num sn-2">02</div>
+        <img src="https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=300&h=200&fit=crop&auto=format" alt="Design Proposal" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:16px;">
+        <h3>Design Proposal</h3>
+        <p>I create a detailed design mockup with material samples, color studies, and a full quote. You get to visualize the finished piece before a single tile is laid.</p>
+      </div>
+      <div class="process-step reveal delay-3">
+        <div class="step-num sn-3">03</div>
+        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=200&fit=crop&auto=format" alt="Handcrafted Creation" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:16px;">
+        <h3>Handcrafted Creation</h3>
+        <p>The magic begins! Each tesserae is hand-cut and placed with precision. You receive photo updates throughout the creation process.</p>
+      </div>
+      <div class="process-step reveal delay-4">
+        <div class="step-num sn-4">04</div>
+        <img src="https://images.unsplash.com/photo-1448630360428-65456885c650?w=300&h=200&fit=crop&auto=format" alt="Installation & Care" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:16px;">
+        <h3>Installation & Care</h3>
+        <p>Professional installation at your location, complete clean-up, and a full care guide. Plus 5-year craftsmanship guarantee on all work.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TESTIMONIALS
+     ============================================================ -->
+<section id="testimonials">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">Client Stories</div>
+      <h2>What Clients Say About <span class="grad-text">Mr.Art</span></h2>
+      <p>Real words from real people whose spaces have been transformed. These aren't just projects — they're relationships built tile by tile.</p>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal delay-1">
+        <div class="tc-stars">★★★★★</div>
+        <p class="tc-text">"Marco transformed our kitchen into an absolute masterpiece. The Italian glass backsplash catches the morning light in the most magical way. We get compliments every single week."</p>
+        <div class="tc-author">
+          <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=80&h=80&fit=crop&auto=format" alt="Sofia Bianchi" class="tc-avatar" style="object-fit:cover;">
+          <div>
+            <div class="tc-name">Sofia Bianchi</div>
+            <div class="tc-role">Interior Designer · Rome</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal delay-2">
+        <div class="tc-stars">★★★★★</div>
+        <p class="tc-text">"Our garden wall mosaic has become the neighbourhood talking point. Marco listened to every detail of our brief and created something that exceeded every expectation. True artistry."</p>
+        <div class="tc-author">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&auto=format" alt="David & Maria" class="tc-avatar" style="object-fit:cover;">
+          <div>
+            <div class="tc-name">David & Maria</div>
+            <div class="tc-role">Homeowners · Tuscany</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal delay-3">
+        <div class="tc-stars">★★★★★</div>
+        <p class="tc-text">"We commissioned Marco for our boutique hotel lobby. The result is a 12-metre wall that every guest photographs. It's become the most-shared image of our property. Priceless ROI."</p>
+        <div class="tc-author">
+          <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&auto=format" alt="Luca Pisano" class="tc-avatar" style="object-fit:cover;">
+          <div>
+            <div class="tc-name">Luca Pisano</div>
+            <div class="tc-role">Hotel Owner · Amalfi Coast</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal delay-4">
+        <div class="tc-stars">★★★★★</div>
+        <p class="tc-text">"The framed mosaic portrait Marco created of our family home in Normandy made my mother cry with joy. It's a heirloom we'll pass down for generations. Truly extraordinary talent."</p>
+        <div class="tc-author">
+          <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&auto=format" alt="Claire Fontaine" class="tc-avatar" style="object-fit:cover;">
+          <div>
+            <div class="tc-name">Claire Fontaine</div>
+            <div class="tc-role">Art Collector · Paris</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal delay-5">
+        <div class="tc-stars">★★★★★</div>
+        <p class="tc-text">"Marco's workshop changed how I see art. His patience and teaching skill are as remarkable as his craft. I came as a complete beginner and left with a piece I'm genuinely proud of."</p>
+        <div class="tc-author">
+          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&auto=format" alt="Anna Kowalski" class="tc-avatar" style="object-fit:cover;">
+          <div>
+            <div class="tc-name">Anna Kowalski</div>
+            <div class="tc-role">Workshop Student · Warsaw</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal delay-6">
+        <div class="tc-stars">★★★★★</div>
+        <p class="tc-text">"Our pool mosaic is breathtaking. Marco designed a Mediterranean seascape that perfectly captures the spirit of our home. The underwater glass work shimmers like a living painting."</p>
+        <div class="tc-author">
+          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&auto=format" alt="Roberto & Nina" class="tc-avatar" style="object-fit:cover;">
+          <div>
+            <div class="tc-name">Roberto & Nina</div>
+            <div class="tc-role">Villa Owners · Sardinia</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CONTACT
+     ============================================================ -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <!-- Info — ALL CENTERED -->
+      <div class="contact-info reveal-left">
+        <div class="section-tag" style="display:inline-flex;">Get In Touch</div>
+        <h2>Let's Create<br/><span class="grad-text">Something Beautiful</span></h2>
+        <p>Ready to transform your space with handcrafted mosaic art? I'd love to hear about your project — no idea is too big or too small.</p>
+
+        <div class="contact-items">
+          <div class="contact-item">
+            <div class="ci-icon ci-1">📧</div>
+            <div>
+              <div class="ci-label">EMAIL</div>
+              <div class="ci-value">hello@mrart-mosaic.com</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="ci-icon ci-2">📍</div>
+            <div>
+              <div class="ci-label">STUDIO</div>
+              <div class="ci-value">Florence, Italy (Global Commissions)</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="ci-icon ci-3">📱</div>
+            <div>
+              <div class="ci-label">PHONE / WHATSAPP</div>
+              <div class="ci-value">+39 055 123 4567</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="ci-icon ci-4">⏰</div>
+            <div>
+              <div class="ci-label">AVAILABILITY</div>
+              <div class="ci-value">Mon–Fri 9am–6pm CET</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:24px;justify-content:center;">
+          <a href="#" class="social-btn" style="background:#E4405F;border-color:#E4405F;color:#fff;">�</a>
+          <a href="#" class="social-btn" style="background:#0077B5;border-color:#0077B5;color:#fff;">in</a>
+          <a href="#" class="social-btn" style="background:#1DA1F2;border-color:#1DA1F2;color:#fff;">🐦</a>
+          <a href="#" class="social-btn" style="background:#BD081C;border-color:#BD081C;color:#fff;">📌</a>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="contact-form reveal-right">
+        <h3>Start Your <span class="grad-text">Project</span></h3>
+        <form id="contactForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-input" placeholder="Marco" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-input" placeholder="Rossi" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-input" placeholder="marco@email.com" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Project Type</label>
+            <select class="form-input">
+              <option value="">Select a service…</option>
+              <option>Interior Mural</option>
+              <option>Garden Art</option>
+              <option>Framed Art Piece</option>
+              <option>Fountain / Pool</option>
+              <option>Commercial Space</option>
+              <option>Workshop / Class</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Budget Range</label>
+              <select class="form-input">
+                <option>Under $500</option>
+                <option>$500 – $2,000</option>
+                <option>$2,000 – $5,000</option>
+                <option>$5,000 – $15,000</option>
+                <option>$15,000+</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Timeline</label>
+              <select class="form-input">
+                <option>Flexible</option>
+                <option>1–3 Months</option>
+                <option>3–6 Months</option>
+                <option>6+ Months</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tell Me About Your Vision</label>
+            <textarea class="form-input" rows="4" placeholder="Describe your space, the feeling you want to create, any colors or themes that inspire you…"></textarea>
+          </div>
+          <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:15px;">
+            ✨ Send My Project Brief
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="nav-logo" style="margin-bottom:14px;">
+          <div class="nav-logo-icon">
+            <span class="logo-t1"></span>
+            <span class="logo-t2"></span>
+            <span class="logo-t3"></span>
+            <span class="logo-t4"></span>
+          </div>
+          Mr<span class="logo-dot">.</span>Art
+        </div>
+        <p>Handcrafted mosaic art for homes, gardens, and spaces that deserve to be extraordinary. Based in Florence, working worldwide.</p>
+        <div class="footer-socials">
+          <a href="#" class="social-btn" style="background:#E4405F;border-color:#E4405F;color:#fff;">�</a>
+          <a href="#" class="social-btn" style="background:#0077B5;border-color:#0077B5;color:#fff;">in</a>
+          <a href="#" class="social-btn" style="background:#1DA1F2;border-color:#1DA1F2;color:#fff;">🐦</a>
+          <a href="#" class="social-btn" style="background:#BD081C;border-color:#BD081C;color:#fff;">📌</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="#about">About Me</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#process">My Process</a></li>
+          <li><a href="#testimonials">Testimonials</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="#services">Interior Murals</a></li>
+          <li><a href="#services">Garden Art</a></li>
+          <li><a href="#services">Framed Pieces</a></li>
+          <li><a href="#services">Pool & Fountain</a></li>
+          <li><a href="#services">Commercial</a></li>
+          <li><a href="#services">Workshops</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Studio</h4>
+        <ul>
+          <li><a href="#">Florence, Italy</a></li>
+          <li><a href="#">hello@mrart-mosaic.com</a></li>
+          <li><a href="#">+39 055 123 4567</a></li>
+          <li><a href="#">Press & Media Kit</a></li>
+          <li><a href="#">Gift Vouchers</a></li>
+          <li><a href="#">Art Certificates</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2025 Mr.Art Mosaic Studio. All rights reserved.</span>
+      <span>Handcrafted with ❤️ in Florence, Italy 🇮🇹</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Mosaic divider at bottom -->
+<div class="mosaic-divider"></div>
+
+<!-- SCROLL TO TOP -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+  // ============================================================
+  // PAGE LOADER
+  // ============================================================
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('hidden');
+    }, 900);
+  });
+
+  // ============================================================
+  // CUSTOM CURSOR
+  // ============================================================
+  const cursor = document.getElementById('cursor');
+  const cursorRing = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    cursorRing.style.left = rx + 'px';
+    cursorRing.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, .portfolio-item, .service-card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '20px'; cursor.style.height = '20px';
+      cursorRing.style.width = '56px'; cursorRing.style.height = '56px';
+      cursor.style.background = 'var(--accent)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '12px'; cursor.style.height = '12px';
+      cursorRing.style.width = '36px'; cursorRing.style.height = '36px';
+      cursor.style.background = 'var(--primary)';
+    });
+  });
+
+  // ============================================================
+  // FLOATING MOSAIC BG TILES
+  // ============================================================
+  const mosaicBg = document.getElementById('mosaicBg');
+  const bgColors = ['#c84b2f','#2d7d6f','#e8b84b','#7b3fa0','#2563a8','#d45f8a','#e86843','#3da494'];
+  for (let i = 0; i < 18; i++) {
+    const t = document.createElement('div');
+    t.className = 'mosaic-tile';
+    const size = 20 + Math.random() * 40;
+    t.style.cssText = `
+      width:${size}px; height:${size}px;
+      background:${bgColors[Math.floor(Math.random()*bgColors.length)]};
+      left:${Math.random()*100}%;
+      animation-duration:${12+Math.random()*14}s;
+      animation-delay:${Math.random()*10}s;
+      border-radius:${Math.random()>0.5?'6px':'50%'};
+    `;
+    mosaicBg.appendChild(t);
+  }
+
+  // ============================================================
+  // HERO MOSAIC SHOWCASE
+  // ============================================================
+  const showcase = document.getElementById('mosaicShowcase');
+  const tileConfigs = [
+    {span:'big',image:'https://images.unsplash.com/photo-1578912681005-fb4b1e0c8576?w=400&h=400&fit=crop&auto=format'},
+    {span:'med',image:'https://images.unsplash.com/photo-1585238342024-78a38b9ae233?w=300&h=300&fit=crop&auto=format'},
+    {span:'small',color:'c3'},
+    {span:'small',color:'c4'},
+    {span:'med',image:'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop&auto=format'},
+    {span:'small',color:'c6'},
+    {span:'small',color:'c7'},
+    {span:'tall',image:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=400&fit=crop&auto=format'},
+    {span:'med',image:'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=300&h=300&fit=crop&auto=format'},
+    {span:'small',color:'c10'},
+    {span:'small',color:'c1'},
+    {span:'med',image:'https://images.unsplash.com/photo-1448630360428-65456885c650?w=300&h=300&fit=crop&auto=format'},
+  ];
+  tileConfigs.forEach((cfg, i) => {
+    const t = document.createElement('div');
+    t.className = `ms-tile ${cfg.span} ${cfg.color || ''}`;
+    t.style.animationDelay = `${i * 0.08}s`;
+    if (cfg.image) {
+      const img = document.createElement('img');
+      img.src = cfg.image;
+      img.alt = `Mosaic Art ${i+1}`;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      t.appendChild(img);
+    }
+    showcase.appendChild(t);
+  });
+
+  // Add staggered entrance animation to tiles
+  showcase.querySelectorAll('.ms-tile').forEach((tile, i) => {
+    tile.style.opacity = '0';
+    tile.style.transform = 'scale(0.5)';
+    setTimeout(() => {
+      tile.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      tile.style.opacity = '1';
+      tile.style.transform = 'scale(1)';
+    }, 1000 + i * 80);
+  });
+
+  // ============================================================
+  // HERO BG MOSAIC PIECES
+  // ============================================================
+  const heroBg = document.getElementById('heroMosaicBg');
+  for (let i = 0; i < 24; i++) {
+    const p = document.createElement('div');
+    p.className = 'mosaic-piece';
+    const size = 30 + Math.random() * 80;
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      background:${bgColors[Math.floor(Math.random()*bgColors.length)]};
+      left:${Math.random()*100}%; top:${Math.random()*100}%;
+      animation-duration:${6+Math.random()*8}s;
+      animation-delay:${Math.random()*4}s;
+      border-radius:${4+Math.random()*8}px;
+    `;
+    heroBg.appendChild(p);
+  }
+
+  // ============================================================
+  // NAVBAR SCROLL EFFECT
+  // ============================================================
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 20);
+    document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 400);
+    updateActiveNavLink();
+  });
+
+  function updateActiveNavLink() {
+    const sections = ['about','services','portfolio','process','testimonials','contact'];
+    let active = '';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top <= 100) active = id;
+    });
+    document.querySelectorAll('.nav-link').forEach(l => {
+      l.classList.toggle('active', l.getAttribute('href') === '#'+active);
+    });
+  }
+
+  // ============================================================
+  // HAMBURGER MENU
+  // ============================================================
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+  function closeMobileMenu() {
+    hamburger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+  }
+  document.addEventListener('click', e => {
+    if (!navbar.contains(e.target) && !mobileMenu.contains(e.target)) {
+      closeMobileMenu();
+    }
+  });
+
+  // ============================================================
+  // THEME TOGGLE
+  // ============================================================
+  const themeToggle = document.getElementById('themeToggle');
+  const savedTheme = localStorage.getItem('mrartTheme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+  themeToggle.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('mrartTheme', next);
+    themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+  });
+
+  // ============================================================
+  // RTL TOGGLE
+  // ============================================================
+  const rtlToggle = document.getElementById('rtlToggle');
+  const savedDir = localStorage.getItem('mrartDir') || 'ltr';
+  document.documentElement.setAttribute('dir', savedDir);
+  rtlToggle.textContent = savedDir === 'rtl' ? 'LTR' : 'RTL';
+
+  rtlToggle.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('dir');
+    const next = cur === 'rtl' ? 'ltr' : 'rtl';
+    document.documentElement.setAttribute('dir', next);
+    localStorage.setItem('mrartDir', next);
+    rtlToggle.textContent = next === 'rtl' ? 'LTR' : 'RTL';
+  });
+
+  // ============================================================
+  // SCROLL REVEAL
+  // ============================================================
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // Trigger highlight animations
+        entry.target.querySelectorAll('.highlight').forEach(h => h.classList.add('animated'));
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => {
+    revealObserver.observe(el);
+  });
+
+  // ============================================================
+  // ANIMATED COUNTERS
+  // ============================================================
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateCounter(entry.target);
+        counterObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+
+  function animateCounter(el) {
+    const target = parseFloat(el.getAttribute('data-count'));
+    const suffix = el.getAttribute('data-suffix') || '';
+    const duration = 1800;
+    const start = performance.now();
+    const isFloat = target % 1 !== 0;
+
+    function update(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const val = eased * target;
+      el.textContent = (isFloat ? val.toFixed(1) : Math.floor(val)) + suffix;
+      if (p < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
+  // ============================================================
+  // PORTFOLIO FILTER
+  // ============================================================
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.getAttribute('data-filter');
+
+      document.querySelectorAll('.portfolio-item').forEach(item => {
+        const cat = item.getAttribute('data-category');
+        const show = filter === 'all' || cat === filter;
+        item.style.transition = 'opacity 0.4s, transform 0.4s';
+        if (show) {
+          item.style.opacity = '1';
+          item.style.transform = 'scale(1)';
+          item.style.display = '';
+        } else {
+          item.style.opacity = '0';
+          item.style.transform = 'scale(0.9)';
+          setTimeout(() => { if (!show) item.style.display = 'none'; }, 400);
+        }
+      });
+    });
+  });
+
+  // ============================================================
+  // PORTFOLIO LIGHTBOX
+  // ============================================================
+  const lightbox = document.getElementById('lightbox');
+  const lightboxClose = document.getElementById('lightboxClose');
+  const lightboxImg = document.getElementById('lightboxImg');
+
+  document.querySelectorAll('.portfolio-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const img = item.querySelector('.portfolio-img');
+      if (img) {
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt;
+        lightbox.classList.add('open');
+      }
+    });
+  });
+
+  lightboxClose.addEventListener('click', () => lightbox.classList.remove('open'));
+  lightbox.addEventListener('click', e => { if(e.target === lightbox) lightbox.classList.remove('open'); });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') lightbox.classList.remove('open'); });
+
+  // ============================================================
+  // CONTACT FORM
+  // ============================================================
+  const toast = document.getElementById('toast');
+  document.getElementById('contactForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const btn = e.target.querySelector('[type=submit]');
+    btn.textContent = '✨ Sending…';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = '✅ Message Sent!';
+      btn.style.background = 'var(--secondary)';
+      e.target.reset();
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+        btn.textContent = '✨ Send My Project Brief';
+        btn.style.background = '';
+        btn.disabled = false;
+      }, 4000);
+    }, 1400);
+  });
+
+  // ============================================================
+  // SMOOTH SCROLL ANCHORS
+  // ============================================================
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+  // ============================================================
+  // TILT EFFECT ON SERVICE CARDS
+  // ============================================================
+  document.querySelectorAll('.service-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = `perspective(1000px) rotateX(${-y*8}deg) rotateY(${x*8}deg) translateY(-8px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+
+  // ============================================================
+  // MOSAIC TILE HOVER SPARKLE
+  // ============================================================
+  document.querySelectorAll('.ms-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      tile.style.boxShadow = `0 0 30px ${bgColors[Math.floor(Math.random()*bgColors.length)]}`;
+      setTimeout(() => tile.style.boxShadow = '', 600);
+    });
+  });
+
+  console.log('%c🎨 Mr.Art Mosaic Studio', 'color:#c84b2f;font-size:16px;font-family:Georgia,serif;font-weight:bold;');
+</script>
+</body>
+</html>

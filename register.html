@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — Mr.Art Mosaic Artist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       MR.ART — CSS VARIABLES & RESET
+       ============================================================ */
+    :root {
+      --bg: #faf8f5;
+      --bg2: #f0ece4;
+      --text: #1a1008;
+      --text2: #5a4e3c;
+      --text3: #8a7d6a;
+      --primary: #c84b2f;
+      --primary2: #e86843;
+      --secondary: #2d7d6f;
+      --secondary2: #3da494;
+      --accent: #e8b84b;
+      --accent2: #f5d06e;
+      --mosaic1: #c84b2f;
+      --mosaic2: #2d7d6f;
+      --mosaic3: #e8b84b;
+      --mosaic4: #7b3fa0;
+      --mosaic5: #2563a8;
+      --mosaic6: #d45f8a;
+      --card-bg: #ffffff;
+      --border: rgba(26,16,8,0.1);
+      --shadow: 0 8px 40px rgba(26,16,8,0.12);
+      --shadow-lg: 0 20px 80px rgba(26,16,8,0.18);
+      --nav-bg: rgba(250,248,245,0.92);
+      --font-display: 'Playfair Display', serif;
+      --font-title: 'Bebas Neue', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --radius: 12px;
+      --transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    [data-theme="dark"] {
+      --bg: #0f0a06;
+      --bg2: #1a1208;
+      --text: #f5f0e8;
+      --text2: #c8bfb0;
+      --text3: #8a7d6a;
+      --card-bg: #221a10;
+      --border: rgba(245,240,232,0.1);
+      --shadow: 0 8px 40px rgba(0,0,0,0.4);
+      --shadow-lg: 0 20px 80px rgba(0,0,0,0.5);
+      --nav-bg: rgba(15,10,6,0.92);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+      transition: background 0.4s, color 0.4s;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    img { max-width: 100%; display: block; }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ============================================================
+       MOSAIC BACKGROUND TILE ANIMATION
+       ============================================================ */
+    .mosaic-bg {
+      position: fixed; inset: 0; z-index: -1;
+      overflow: hidden; pointer-events: none;
+    }
+    .mosaic-tile {
+      position: absolute;
+      border-radius: 4px;
+      opacity: 0;
+      animation: tileFloat linear infinite;
+    }
+    @keyframes tileFloat {
+      0% { opacity: 0; transform: translateY(100vh) rotate(0deg); }
+      10% { opacity: 0.15; }
+      90% { opacity: 0.15; }
+      100% { opacity: 0; transform: translateY(-100px) rotate(360deg); }
+    }
+
+    /* ============================================================
+       REGISTER CONTAINER
+       ============================================================ */
+    .register-container {
+      width: 100%;
+      max-width: 440px;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .register-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 48px 40px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.8s ease 0.3s both;
+    }
+
+    .register-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+      transform: scaleX(1);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Logo */
+    .register-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+    }
+
+    .logo-icon span {
+      border-radius: 3px;
+      transition: transform 0.4s;
+    }
+
+    .logo-t1 { background: var(--primary); }
+    .logo-t2 { background: var(--secondary); }
+    .logo-t3 { background: var(--accent); }
+    .logo-t4 { background: var(--mosaic4); }
+
+    /* Create Account Text */
+    .register-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .register-header h1 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .register-header p {
+      color: var(--text2);
+      font-size: 0.95rem;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      transition: var(--transition);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--card-bg);
+      box-shadow: 0 0 0 3px rgba(200,75,47,0.1);
+    }
+
+    .form-input::placeholder {
+      color: var(--text3);
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--card-bg);
+      box-shadow: 0 0 0 3px rgba(200,75,47,0.1);
+    }
+
+    /* Checkbox */
+    .form-checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .checkbox-input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      margin-top: 2px;
+    }
+
+    .checkbox-label {
+      font-size: 0.85rem;
+      color: var(--text2);
+      line-height: 1.5;
+    }
+
+    .checkbox-label a {
+      color: var(--primary);
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .checkbox-label a:hover {
+      color: var(--primary2);
+      text-decoration: underline;
+    }
+
+    /* Submit Button */
+    .btn-submit {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .btn-submit::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.18));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .btn-submit:hover {
+      background: var(--primary2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(200,75,47,0.35);
+    }
+
+    .btn-submit:hover::before {
+      opacity: 1;
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider-text {
+      font-size: 0.8rem;
+      color: var(--text3);
+      font-weight: 500;
+    }
+
+    /* Social Buttons */
+    .social-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .btn-social {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px 20px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--card-bg);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-social:hover {
+      border-color: var(--primary);
+      background: rgba(200,75,47,0.05);
+      transform: translateY(-2px);
+    }
+
+    .social-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Login Link */
+    .login-link {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text2);
+    }
+
+    .login-link a {
+      color: var(--primary);
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .login-link a:hover {
+      color: var(--primary2);
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .register-container {
+        padding: 16px;
+      }
+      
+      .register-card {
+        padding: 36px 24px;
+      }
+      
+      .register-header h1 {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Mosaic Background -->
+  <div class="mosaic-bg" id="mosaicBg"></div>
+
+  <!-- Register Container -->
+  <div class="register-container">
+    <div class="register-card">
+      <!-- Logo -->
+      <div class="register-logo">
+        <div class="logo-icon">
+          <span class="logo-t1"></span>
+          <span class="logo-t2"></span>
+          <span class="logo-t3"></span>
+          <span class="logo-t4"></span>
+        </div>
+        <span>Mr.Art<span style="color: var(--primary);">.</span></span>
+      </div>
+
+      <!-- Create Account Text -->
+      <div class="register-header">
+        <h1>Create Account</h1>
+        <p>Join our mosaic art community</p>
+      </div>
+
+      <!-- Register Form -->
+      <form id="registerForm">
+        <div class="form-group">
+          <label class="form-label" for="name">Name</label>
+          <input type="text" id="name" class="form-input" placeholder="Enter your full name" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input type="email" id="email" class="form-input" placeholder="Enter your email" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="role">Your Role</label>
+          <select id="role" class="form-select" required>
+            <option value="">Select your role</option>
+            <option value="artist">Artist</option>
+            <option value="collector">Art Collector</option>
+            <option value="designer">Designer</option>
+            <option value="enthusiast">Art Enthusiast</option>
+            <option value="student">Student</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" id="password" class="form-input" placeholder="Create a strong password" required>
+        </div>
+
+        <div class="form-checkbox-group">
+          <input type="checkbox" id="terms" class="checkbox-input" required>
+          <label for="terms" class="checkbox-label">
+            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-submit">Create My Account</button>
+      </form>
+
+      <!-- Divider -->
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">OR</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Social Buttons -->
+      <div class="social-buttons">
+        <button type="button" class="btn-social" onclick="handleSocialRegister('google')">
+          <div class="social-icon">🔍</div>
+          <span>Continue with Google</span>
+        </button>
+        <button type="button" class="btn-social" onclick="handleSocialRegister('facebook')">
+          <div class="social-icon">📘</div>
+          <span>Continue with Facebook</span>
+        </button>
+      </div>
+
+      <!-- Login Link -->
+      <div class="login-link">
+        Already have an account? <a href="login.html">Log in</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Generate mosaic background tiles
+    function createMosaicTiles() {
+      const mosaicBg = document.getElementById('mosaicBg');
+      const colors = ['#c84b2f', '#2d7d6f', '#e8b84b', '#7b3fa0', '#2563a8', '#d45f8a'];
+      const tileCount = 15;
+      
+      for (let i = 0; i < tileCount; i++) {
+        const tile = document.createElement('div');
+        tile.className = 'mosaic-tile';
+        tile.style.background = colors[Math.floor(Math.random() * colors.length)];
+        tile.style.left = Math.random() * 100 + '%';
+        tile.style.width = tile.style.height = Math.random() * 30 + 20 + 'px';
+        tile.style.animationDuration = Math.random() * 20 + 15 + 's';
+        tile.style.animationDelay = Math.random() * 10 + 's';
+        mosaicBg.appendChild(tile);
+      }
+    }
+
+    // Handle form submission
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const role = document.getElementById('role').value;
+      const password = document.getElementById('password').value;
+      const terms = document.getElementById('terms').checked;
+      
+      // Simple validation
+      if (!name || !email || !role || !password) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      if (!terms) {
+        alert('Please agree to the Terms of Service and Privacy Policy');
+        return;
+      }
+      
+      if (password.length < 8) {
+        alert('Password must be at least 8 characters long');
+        return;
+      }
+      
+      // Here you would normally send the data to your server
+      console.log('Registration attempt:', { name, email, role, password });
+      alert('Registration functionality would be implemented here');
+    });
+
+    // Handle social registration
+    function handleSocialRegister(provider) {
+      console.log('Social registration with:', provider);
+      alert(`${provider} registration would be implemented here`);
+    }
+
+    // Initialize
+    createMosaicTiles();
+  </script>
+</body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Mr.Art Mosaic Artist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       MR.ART — CSS VARIABLES & RESET
+       ============================================================ */
+    :root {
+      --bg: #faf8f5;
+      --bg2: #f0ece4;
+      --text: #1a1008;
+      --text2: #5a4e3c;
+      --text3: #8a7d6a;
+      --primary: #c84b2f;
+      --primary2: #e86843;
+      --secondary: #2d7d6f;
+      --secondary2: #3da494;
+      --accent: #e8b84b;
+      --accent2: #f5d06e;
+      --mosaic1: #c84b2f;
+      --mosaic2: #2d7d6f;
+      --mosaic3: #e8b84b;
+      --mosaic4: #7b3fa0;
+      --mosaic5: #2563a8;
+      --mosaic6: #d45f8a;
+      --card-bg: #ffffff;
+      --border: rgba(26,16,8,0.1);
+      --shadow: 0 8px 40px rgba(26,16,8,0.12);
+      --shadow-lg: 0 20px 80px rgba(26,16,8,0.18);
+      --nav-bg: rgba(250,248,245,0.92);
+      --font-display: 'Playfair Display', serif;
+      --font-title: 'Bebas Neue', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --radius: 12px;
+      --transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    [data-theme="dark"] {
+      --bg: #0f0a06;
+      --bg2: #1a1208;
+      --text: #f5f0e8;
+      --text2: #c8bfb0;
+      --text3: #8a7d6a;
+      --card-bg: #221a10;
+      --border: rgba(245,240,232,0.1);
+      --shadow: 0 8px 40px rgba(0,0,0,0.4);
+      --shadow-lg: 0 20px 80px rgba(0,0,0,0.5);
+      --nav-bg: rgba(15,10,6,0.92);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+      transition: background 0.4s, color 0.4s;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    img { max-width: 100%; display: block; }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ============================================================
+       MOSAIC BACKGROUND TILE ANIMATION
+       ============================================================ */
+    .mosaic-bg {
+      position: fixed; inset: 0; z-index: -1;
+      overflow: hidden; pointer-events: none;
+    }
+    .mosaic-tile {
+      position: absolute;
+      border-radius: 4px;
+      opacity: 0;
+      animation: tileFloat linear infinite;
+    }
+    @keyframes tileFloat {
+      0% { opacity: 0; transform: translateY(100vh) rotate(0deg); }
+      10% { opacity: 0.15; }
+      90% { opacity: 0.15; }
+      100% { opacity: 0; transform: translateY(-100px) rotate(360deg); }
+    }
+
+    /* ============================================================
+       LOGIN CONTAINER
+       ============================================================ */
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 48px 40px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.8s ease 0.3s both;
+    }
+
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+      transform: scaleX(1);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Logo */
+    .login-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+    }
+
+    .logo-icon span {
+      border-radius: 3px;
+      transition: transform 0.4s;
+    }
+
+    .logo-t1 { background: var(--primary); }
+    .logo-t2 { background: var(--secondary); }
+    .logo-t3 { background: var(--accent); }
+    .logo-t4 { background: var(--mosaic4); }
+
+    /* Welcome Text */
+    .login-welcome {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .login-welcome h1 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .login-welcome p {
+      color: var(--text2);
+      font-size: 0.95rem;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      transition: var(--transition);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--card-bg);
+      box-shadow: 0 0 0 3px rgba(200,75,47,0.1);
+    }
+
+    .form-input::placeholder {
+      color: var(--text3);
+    }
+
+    /* Checkbox */
+    .form-checkbox-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checkbox-input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .checkbox-label {
+      font-size: 0.85rem;
+      color: var(--text2);
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      font-size: 0.85rem;
+      color: var(--primary);
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .forgot-link:hover {
+      color: var(--primary2);
+      text-decoration: underline;
+    }
+
+    /* Submit Button */
+    .btn-submit {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .btn-submit::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.18));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .btn-submit:hover {
+      background: var(--primary2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(200,75,47,0.35);
+    }
+
+    .btn-submit:hover::before {
+      opacity: 1;
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider-text {
+      font-size: 0.8rem;
+      color: var(--text3);
+      font-weight: 500;
+    }
+
+    /* Social Buttons */
+    .social-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .btn-social {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px 20px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--card-bg);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-social:hover {
+      border-color: var(--primary);
+      background: rgba(200,75,47,0.05);
+      transform: translateY(-2px);
+    }
+
+    .social-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Sign Up Link */
+    .signup-link {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text2);
+    }
+
+    .signup-link a {
+      color: var(--primary);
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .signup-link a:hover {
+      color: var(--primary2);
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 16px;
+      }
+      
+      .login-card {
+        padding: 36px 24px;
+      }
+      
+      .login-welcome h1 {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Mosaic Background -->
+  <div class="mosaic-bg" id="mosaicBg"></div>
+
+  <!-- Login Container -->
+  <div class="login-container">
+    <div class="login-card">
+      <!-- Logo -->
+      <div class="login-logo">
+        <div class="logo-icon">
+          <span class="logo-t1"></span>
+          <span class="logo-t2"></span>
+          <span class="logo-t3"></span>
+          <span class="logo-t4"></span>
+        </div>
+        <span>Mr.Art<span style="color: var(--primary);">.</span></span>
+      </div>
+
+      <!-- Welcome Text -->
+      <div class="login-welcome">
+        <h1>Welcome Back</h1>
+        <p>Please login to your account</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input type="email" id="email" class="form-input" placeholder="Enter your email" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+        </div>
+
+        <div class="form-checkbox-group">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="remember" class="checkbox-input">
+            <label for="remember" class="checkbox-label">Remember me</label>
+          </div>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-submit">Log In</button>
+      </form>
+
+      <!-- Divider -->
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">OR</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Social Buttons -->
+      <div class="social-buttons">
+        <button type="button" class="btn-social" onclick="handleSocialLogin('google')">
+          <div class="social-icon">🔍</div>
+          <span>Continue with Google</span>
+        </button>
+        <button type="button" class="btn-social" onclick="handleSocialLogin('facebook')">
+          <div class="social-icon">📘</div>
+          <span>Continue with Facebook</span>
+        </button>
+      </div>
+
+      <!-- Sign Up Link -->
+      <div class="signup-link">
+        Don't have an account? <a href="register.html">Sign up free</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Generate mosaic background tiles
+    function createMosaicTiles() {
+      const mosaicBg = document.getElementById('mosaicBg');
+      const colors = ['#c84b2f', '#2d7d6f', '#e8b84b', '#7b3fa0', '#2563a8', '#d45f8a'];
+      const tileCount = 15;
+      
+      for (let i = 0; i < tileCount; i++) {
+        const tile = document.createElement('div');
+        tile.className = 'mosaic-tile';
+        tile.style.background = colors[Math.floor(Math.random() * colors.length)];
+        tile.style.left = Math.random() * 100 + '%';
+        tile.style.width = tile.style.height = Math.random() * 30 + 20 + 'px';
+        tile.style.animationDuration = Math.random() * 20 + 15 + 's';
+        tile.style.animationDelay = Math.random() * 10 + 's';
+        mosaicBg.appendChild(tile);
+      }
+    }
+
+    // Handle form submission
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      // Simple validation
+      if (!email || !password) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      // Here you would normally send the data to your server
+      console.log('Login attempt:', { email, password });
+      alert('Login functionality would be implemented here');
+    });
+
+    // Handle social login
+    function handleSocialLogin(provider) {
+      console.log('Social login with:', provider);
+      alert(`${provider} login would be implemented here`);
+    }
+
+    // Initialize
+    createMosaicTiles();
+  </script>
+</body>
+</html>
