@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freelance Mosaic Artist — Documentation</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* ============================================================
+           GLOBAL STYLES
+           ============================================================ */
+        :root {
+            --bg: #0a0a0b;
+            --surface: #141416;
+            --surface-hover: #1c1c1f;
+            --primary: #c84b2f;
+            --primary-light: #e86843;
+            --text: #e2e2e5;
+            --text-dim: #94949e;
+            --border: rgba(255, 255, 255, 0.08);
+            --sidebar-width: 280px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --header-height: 70px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+        li {
+            list-style: none;
+        }
+
+        /* ============================================================
+           UTILITIES
+           ============================================================ */
+        .container {
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .card {
+            width: 100%;
+            word-wrap: break-word;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            background: var(--surface-hover);
+        }
+
+        code {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--primary-light);
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #000;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 16px 0;
+            border: 1px solid var(--border);
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: #d1d1d1;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(200, 75, 47, 0.15);
+            color: var(--primary-light);
+            margin-bottom: 12px;
+        }
+
+        /* ============================================================
+           PROGRESS BAR
+           ============================================================ */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 2000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.1s ease;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* ============================================================
+           SIDEBAR
+           ============================================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 40px 24px;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: var(--transition);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 48px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-dim);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-item a:hover, .nav-item.active a {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item.active a {
+            color: var(--primary-light);
+            background: rgba(200, 75, 47, 0.1);
+        }
+
+        /* ============================================================
+           MAIN CONTENT
+           ============================================================ */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 80px 60px;
+            max-width: 1100px;
+            min-height: 100vh;
+        }
+
+        section {
+            padding-top: 80px;
+            margin-top: -80px;
+            margin-bottom: 80px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 24px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin: 24px 0 16px;
+            color: var(--primary-light);
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: var(--text-dim);
+        }
+
+        .grid-docs {
+            display: grid;
+            gap: 24px;
+            margin: 24px 0;
+        }
+
+        /* ============================================================
+           HAMBURGER & MOBILE
+           ============================================================ */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            z-index: 1500;
+            padding: 0 24px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        /* ============================================================
+           RESPONSIVE RULES
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 100px 32px;
+            }
+
+            .mobile-header {
+                display: flex;
+            }
+
+            h1 { font-size: 2.5rem; }
+        }
+
+        @media (max-width: 768px) {
+            .grid-docs {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .grid-docs {
+                grid-template-columns: 1fr;
+            }
+            h1 { font-size: 2rem; }
+        }
+
+        /* ============================================================
+           PRINT STYLES
+           ============================================================ */
+        @media print {
+            .sidebar, .progress-container, .mobile-header, .btn-download, .nav-item {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+            }
+
+            body {
+                background: white !important;
+                color: black !important;
+            }
+
+            .card {
+                border: 1px solid #ddd !important;
+                break-inside: avoid;
+            }
+
+            h1, h2, h3 { color: black !important; }
+            p, code { color: #333 !important; }
+        }
+
+        /* ============================================================
+           DOWNLOAD BUTTON
+           ============================================================ */
+        .btn-download {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            background: var(--primary);
+            color: white !important;
+            padding: 16px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(200, 75, 47, 0.4);
+            z-index: 1000;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-5px);
+            background: var(--primary-light);
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 900;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Steps / Lists */
+        .step-list {
+            counter-reset: step;
+            margin: 20px 0;
+        }
+
+        .step-item {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 24px;
+        }
+
+        .step-item::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .folder-tree {
+            font-family: monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+            margin: 15px 0;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .todo-item {
+            border-left: 3px solid #ffcc00;
+            background: rgba(255, 204, 0, 0.05);
+            padding: 12px 16px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #d4af37;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <div class="sidebar-logo">Freelance Mosaic</div>
+        <button class="menu-toggle" id="menuToggle">
+            <i data-lucide="menu"></i>
+        </button>
+    </header>
+
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <i data-lucide="palette" style="color: var(--primary);"></i>
+            <span>Mr.Art Studio</span>
+        </div>
+        <nav>
+            <ul class="nav-list">
+                <li class="nav-item active"><a href="#introduction"><i data-lucide="home"></i> Introduction</a></li>
+                <li class="nav-item"><a href="#installation"><i data-lucide="download"></i> Installation</a></li>
+                <li class="nav-item"><a href="#customization"><i data-lucide="settings"></i> Customization</a></li>
+                <li class="nav-item"><a href="#structure"><i data-lucide="layers"></i> Page Structure</a></li>
+                <li class="nav-item"><a href="#credits"><i data-lucide="award"></i> Credits</a></li>
+                <li class="nav-item"><a href="#changelog"><i data-lucide="history"></i> Changelog</a></li>
+                <li class="nav-item"><a href="#support"><i data-lucide="life-buoy"></i> Support</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <!-- Introduction -->
+        <section id="introduction">
+            <span class="badge">Documentation v1.0</span>
+            <h1>Mr.Art — Mosaic Artist Website</h1>
+            <p>Welcome to the official documentation for the **Freelance Mosaic Artist Portfolio**. This premium, single-page interactive website is designed for artists who want to showcase their craftsmanship with an elegant, mosaic-inspired aesthetic. Built with performance and responsiveness in mind, this project is ready for immediate deployment.</p>
+            
+            <div class="card">
+                <h3>Key Features</h3>
+                <ul style="color: var(--text-dim); padding-left: 20px;">
+                    <li style="list-style: disc; margin-bottom: 8px;">Adaptive Mosaic Background with Floating Tile Animations.</li>
+                    <li style="list-style: disc; margin-bottom: 8px;">Fully Responsive Dark/Light UI Support.</li>
+                    <li style="list-style: disc; margin-bottom: 8px;">Interactive Service Cards with 3D Tilt Effects.</li>
+                    <li style="list-style: disc; margin-bottom: 8px;">Filtered Portfolio Gallery with Image Lightbox.</li>
+                    <li style="list-style: disc; margin-bottom: 8px;">Client Success & Process Walkthrough Sections.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Installation Guide -->
+        <!-- ================= SECTION: INSTALLATION GUIDE ================= -->
+        <section id="installation">
+            <h2><i data-lucide="box"></i> 1. Installation Guide</h2>
+            <p>Setting up your new portfolio is straightforward. Follow these steps to get your site live on your local machine or hosting server.</p>
+
+            <div class="step-list">
+                <div class="step-item">
+                    <h3>Download and Extract</h3>
+                    <p>Extract the provided <code>.zip</code> file into a directory of your choice. Ensure you have all the core files: <code>index.html</code>, <code>login.html</code>, and <code>register.html</code>.</p>
+                    <div class="folder-tree">
+                        /freelance_mosaic_artist<br>
+                        ├── index.html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Main Website)<br>
+                        ├── login.html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Client Portal Login)<br>
+                        ├── register.html &nbsp;&nbsp;&nbsp; (New Client Signup)<br>
+                        └── assets/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Images and Icons)
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <h3>Open in Code Editor</h3>
+                    <p>We recommend using <strong>Visual Studio Code (VS Code)</strong>. Open the project folder in VS Code to see the organized source code.</p>
+                </div>
+
+                <div class="step-item">
+                    <h3>Running Locally</h3>
+                    <p>To view your site locally, you can simply double-click <code>index.html</code>. However, for the best experience (including smooth scrolling and internal links), use a local server like the <strong>Live Server</strong> extension in VS Code. Simply right-click <code>index.html</code> and select "Open with Live Server".</p>
+                </div>
+
+                <div class="step-item">
+                    <h3>Deployment</h3>
+                    <p>Once you are ready to go public, upload your files to your hosting provider via FTP or cPanel File Manager. Your main file must be named <code>index.html</code> for it to be recognized as the homepage.</p>
+                </div>
+            </div>
+
+            <div class="card" style="border-left: 4px solid #ff4d4d; background: rgba(255, 77, 77, 0.05);">
+                <h3><i data-lucide="alert-triangle"></i> Common Pitfalls</h3>
+                <p><strong>Images not showing?</strong> Check the file paths in the <code>&lt;img&gt;</code> tags. Ensure the images are inside the <code>assets/</code> folder as referenced.</p>
+                <p><strong>Layout broken?</strong> Ensure you haven't renamed any CSS classes. The layout relies on specific class names defined in the style block.</p>
+            </div>
+        </section>
+
+        <!-- Customization Guide -->
+        <!-- ================= SECTION: CUSTOMIZATION GUIDE ================= -->
+        <section id="customization">
+            <h2><i data-lucide="edit-3"></i> 2. Customization Guide</h2>
+            <p>Make the website truly yours by tweaking the colors, fonts, and content. Most of the configuration is handled at the top of the <code>index.html</code> file.</p>
+
+            <h3>How to Modify Colors</h3>
+            <p>The site uses CSS variables for easy color management. Look for the <code>:root</code> block at the top of the stylesheet.</p>
+            <pre><code>:root {
+  --primary: #c84b2f;  /* Main Accent Color */
+  --secondary: #2d7d6f; /* Secondary Theme Color */
+  --bg: #faf8f5;       /* Light Mode Background */
+  --text: #1a1008;     /* Body Text Color */
+}</code></pre>
+            <div class="todo-item"><strong>TODO:</strong> Locate the <code>[data-theme="dark"]</code> block to customize the dark mode appearance.</div>
+
+            <h3>Google Fonts Integration</h3>
+            <p>Change the typography by updating the HTML <code>&lt;link&gt;</code> in the <code>&lt;head&gt;</code> section. Once you add a new font, update the CSS variable:</p>
+            <pre><code>--font-body: 'New Font Name', sans-serif;</code></pre>
+
+            <div class="grid-docs" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                <div class="card">
+                    <h3>Replacing Images</h3>
+                    <p>Replace existing images in the <code>assets/</code> folder using the same names, or update the <code>src</code> attribute in HTML. Recommended size for Hero image: 1920x1080px.</p>
+                </div>
+                <div class="card">
+                    <h3>Updating Text Content</h3>
+                    <p>All headings and paragraphs are found between <code>&lt;h1&gt;</code>, <code>&lt;h2&gt;</code>, and <code>&lt;p&gt;</code> tags. Use <code>Ctrl+F</code> to search for specific text you wish to change.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Best Practices</h3>
+                <ul style="color: var(--text-dim);">
+                    <li>✅ Always keep a backup of the original <code>index.html</code> before editing.</li>
+                    <li>✅ Use compressed images to keep page load speeds fast.</li>
+                    <li>❌ Don't remove the <code>viewport</code> meta tag; it will break responsiveness.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Page Structure -->
+        <!-- ================= SECTION: PAGE STRUCTURE ================= -->
+        <section id="structure">
+            <h2><i data-lucide="layout"></i> 3. Page Structure</h2>
+            <p>The site is organized into logical sections, making it easy to navigate and maintain. Each component is self-contained.</p>
+
+            <div class="card">
+                <h3>Home Page (index.html)</h3>
+                <div class="step-list">
+                    <div class="step-item">
+                        <strong>Navbar:</strong> Sticky navigation with Logo (left), Links (center), and Action buttons (right).
+                    </div>
+                    <div class="step-item">
+                        <strong>Hero Section:</strong> High-impact introduction with floating mosaic pieces and primary CTA buttons.
+                    </div>
+                    <div class="step-item">
+                        <strong>About Artist:</strong> Detailed biography area with a skill grid and unique "Years of Experience" badge.
+                    </div>
+                    <div class="step-item">
+                        <strong>Services:</strong> 3x2 Grid of service cards (Murals, Restorations, Workshops, etc.) with pricing info.
+                    </div>
+                    <div class="step-item">
+                        <strong>Portfolio Gallery:</strong> Categorized work showcase with high-res lightbox and category filters.
+                    </div>
+                    <div class="step-item">
+                        <strong>Process:</strong> 4-step walkthrough explaining the journey from consultation to installation.
+                    </div>
+                    <div class="step-item">
+                        <strong>Testimonials:</strong> Scrolling card section featuring client feedback and trust badges.
+                    </div>
+                    <div class="step-item">
+                        <strong>Contact:</strong> Integrated form for project inquiries with success toast notifications.
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-docs" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                <div class="card">
+                    <h3>Login / Register</h3>
+                    <p>Standardized forms for client onboarding. These are standalone pages designed to sync with your backend (PHP/Node/Firebase).</p>
+                </div>
+                <div class="card">
+                    <h3>Dashboard (Planned)</h3>
+                    <p>The <code>login</code> flow leads to a future dashboard where clients can track project progress, view invoices, and chat directly with the artist.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Credits -->
+        <!-- ================= SECTION: CREDITS ================= -->
+        <section id="credits">
+            <h2><i data-lucide="award"></i> 4. Credits</h2>
+            <p>This project leverages high-quality third-party resources to provide a professional user experience.</p>
+            
+            <div class="grid-docs" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div class="card">
+                    <strong>Typography</strong><br>
+                    <a href="https://fonts.google.com" target="_blank">Google Fonts</a><br>
+                    (Playfair Display, DM Sans, Bebas Neue)
+                </div>
+                <div class="card">
+                    <strong>Icons</strong><br>
+                    <a href="https://lucide.dev" target="_blank">Lucide Icons</a> & SVG Graphics
+                </div>
+                <div class="card">
+                    <strong>Images</strong><br>
+                    <a href="https://unsplash.com" target="_blank">Unsplash</a> & <a href="https://pexels.com" target="_blank">Pexels</a>
+                </div>
+                <div class="card">
+                    <strong>Scripts</strong><br>
+                    Vanilla JS (ES6+)<br>
+                    No JQuery required.
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>License</h3>
+                <p>This template is provided for **Commercial and Personal Use**. You are free to modify the template for your business needs, provided you do not resell the template as a standalone product.</p>
+            </div>
+        </section>
+
+        <!-- Changelog -->
+        <!-- ================= SECTION: CHANGELOG ================= -->
+        <section id="changelog">
+            <h2><i data-lucide="history"></i> 5. Changelog</h2>
+            <p>Stay updated with the latest improvements and bug fixes.</p>
+
+            <div class="card">
+                <div style="margin-bottom: 24px;">
+                    <span class="badge" style="background: rgba(0, 200, 0, 0.15); color: #4ade80;">v1.2 Current</span>
+                    <ul style="color: var(--text-dim); padding-left: 20px;">
+                        <li>Updated: Smooth scroll behavior improved for Safari browsers.</li>
+                        <li>Fixed: Mobile menu overflow issue on iPhone SE.</li>
+                        <li>Added: "Download PDF" functionality for documentation.</li>
+                    </ul>
+                </div>
+                <hr style="border: none; border-top: 1px solid var(--border); margin: 20px 0;">
+                <div style="margin-bottom: 24px; opacity: 0.6;">
+                    <span class="badge">v1.1</span>
+                    <ul style="color: var(--text-dim); padding-left: 20px;">
+                        <li>Improvement: Refined 3D Tilt sensitivity on service cards.</li>
+                        <li>UI: Enhanced Dark Mode contrast for better accessibility.</li>
+                    </ul>
+                </div>
+                <div style="opacity: 0.4;">
+                    <span class="badge">v1.0</span>
+                    <p style="padding-left: 20px;">Initial Release — Full mosaic theme implementation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Support -->
+        <!-- ================= SECTION: SUPPORT ================= -->
+        <section id="support">
+            <h2><i data-lucide="life-buoy"></i> 6. Support</h2>
+            <p>Need help? Our dedicated support team is here to assist you with any technical hurdles.</p>
+
+            <div class="card">
+                <h3>Contact Information</h3>
+                <p><i data-lucide="mail" style="vertical-align: middle; margin-right: 8px;"></i> Email: <strong>support@mrarstudio.com</strong></p>
+                <p><i data-lucide="clock" style="vertical-align: middle; margin-right: 8px;"></i> Response Time: <strong>Within 24-48 Hours</strong></p>
+            </div>
+
+            <div class="card">
+                <h3>When Requesting Help</h3>
+                <p>Please provide the following details to help us solve your issue faster:</p>
+                <ul style="color: var(--text-dim); padding-left: 20px;">
+                    <li>Describe the issue clearly.</li>
+                    <li>Screenshot of the error or broken section.</li>
+                    <li>Browser version (Chrome, Safari, Firefox).</li>
+                    <li>Hosting environment details (if deployed).</li>
+                </ul>
+            </div>
+
+            <div class="card" style="border-left: 4px solid var(--primary);">
+                <h3>Quick Troubleshooting</h3>
+                <p><strong>Mobile menu not opening?</strong> Check if you have any JS errors in the browser console (F12). Usually caused by missing scripts.</p>
+                <p><strong>Form not sending?</strong> Ensure you have connected the static HTML form to a backend service like <em>Formspree</em> or your own PHP script.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Download PDF FAB -->
+    <button class="btn-download" onclick="window.print()">
+        <i data-lucide="file-text"></i>
+        Export to PDF
+    </button>
+
+    <!-- Scripts -->
+    <script>
+        // Start Lucide Icons
+        lucide.createIcons();
+
+        // ============================================================
+        // PROGRESS TRACKER
+        // ============================================================
+        window.onscroll = function() {
+            updateProgressBar();
+            updateActiveSection();
+        };
+
+        function updateProgressBar() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+        }
+
+        // ============================================================
+        // MOBILE SIDEBAR TOGGLE
+        // ============================================================
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        const overlay = document.getElementById('overlay');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        });
+
+        // Close sidebar on link click (mobile)
+        document.querySelectorAll('.nav-item a').forEach(link => {
+            link.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            });
+        });
+
+        // ============================================================
+        // SCROLL REVEAL / ACTIVE HIGHLIGHT
+        // ============================================================
+        const sections = document.querySelectorAll('section');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        function updateActiveSection() {
+            let current = "";
+            sections.forEach((section) => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute("id");
+                }
+            });
+
+            navItems.forEach((item) => {
+                item.classList.remove("active");
+                if (item.querySelector('a').getAttribute("href") === `#${current}`) {
+                    item.classList.add("active");
+                }
+            });
+        }
+
+        // ============================================================
+        // SMOOTH SCROLLING
+        // ============================================================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // ============================================================
+        // TODO / MARKER LOGGING
+        // ============================================================
+        // Note: TODO markers are kept in the HTML source for developer visibility.
+        console.info('Documentation loaded. Interactive features: Progress Tracking, PDF Export, Responsive Sidebar.');
+    </script>
+</body>
+</html>
